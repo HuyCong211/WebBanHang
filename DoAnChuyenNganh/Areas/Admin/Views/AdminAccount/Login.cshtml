@@ -1,0 +1,143 @@
+﻿@model DoAnChuyenNganh.Models.LoginViewModel
+@{
+    ViewBag.Title = "Đăng nhập quản trị";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdminLogin.cshtml";
+}
+
+<div class="login-wrapper d-flex justify-content-center align-items-center vh-100">
+    <div class="login-card animate__animated animate__fadeInDown">
+        <h2 class="text-center mb-4">Đăng nhập quản trị</h2>
+
+        @* ✅ Thêm hiển thị lỗi server *@
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger text-center">
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <div>@error.ErrorMessage</div>
+                }
+            </div>
+        }
+
+        @using (Html.BeginForm("Login", "AdminAccount", FormMethod.Post, new { area = "Admin", id = "loginForm" }))
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="form-group mb-3">
+                <label>Email</label>
+                @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "Nhập email của bạn", id = "Email" })
+            </div>
+
+            <div class="form-group mb-4">
+                <label>Mật khẩu</label>
+                @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Nhập mật khẩu", id = "Password" })
+            </div>
+
+            <div id="errorMessage" class="text-danger mb-3 text-center"></div>
+
+            <button type="submit" class="btn btn-primary w-100">Đăng nhập</button>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"></script>
+    <script>
+        document.getElementById("loginForm").addEventListener("submit", function (e) {
+            const email = document.getElementById("Email").value.trim();
+            const password = document.getElementById("Password").value.trim();
+            const error = document.getElementById("errorMessage");
+            error.innerText = "";
+
+            if (!email && !password) {
+                e.preventDefault();
+                error.innerText = "Bạn phải nhập đủ thông tin.";
+                return;
+            }
+            if (!email) {
+                e.preventDefault();
+                error.innerText = "Vui lòng nhập email.";
+                return;
+            }
+            if (!password) {
+                e.preventDefault();
+                error.innerText = "Vui lòng nhập mật khẩu.";
+                return;
+            }
+        });
+    </script>
+}
+
+
+
+
+<style>
+    body {
+        background: linear-gradient(135deg, #1d2671, #c33764);
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .login-wrapper {
+        width: 100%;
+        max-width: 420px;
+    }
+
+    .login-card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        padding: 40px 30px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .login-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
+    }
+
+    .form-control {
+        border-radius: 10px;
+        border: 1px solid #ddd;
+        height: 45px;
+        transition: border-color 0.3s;
+    }
+
+    .form-control:focus {
+        border-color: #6a11cb;
+        box-shadow: 0 0 5px rgba(106, 17, 203, 0.4);
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #6a11cb, #2575fc);
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        height: 45px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #2575fc, #6a11cb);
+        transform: translateY(-2px);
+    }
+
+    #errorMessage {
+        animation: shake 0.3s ease-in-out;
+        text-align: center;
+        font-weight: 500;
+    }
+
+    @@keyframes shake {
+        0% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        50% { transform: translateX(5px); }
+        75% { transform: translateX(-5px); }
+        100% { transform: translateX(0); }
+    }
+</style>
+

@@ -1,0 +1,140 @@
+﻿@model DoAnChuyenNganh.Models.EF.TonKho
+
+@{
+    ViewBag.Title = "Delete";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+
+@section naviheader
+{
+    <!-- Left navbar links -->
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/admin/home" class="nav-link">Trang chủ</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/admin/tonkhoes" class="nav-link">TỒN KHO</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="#" class="nav-link">Xóa</a>
+        </li>
+    </ul>
+}
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Chi tiết tồn kho cần xóa</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="/admin/tonkhoes/">Tồn kho</a></li>
+                    <li class="breadcrumb-item active">Xóa</li>
+                </ol>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<!-- Main content -->
+<section class="content">
+
+    <!-- Default box -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Thông tin tồn kho cần xóa</h3>
+
+        </div>
+        <div class="card-body">
+            <div class="bs-stepper-content">
+                <dl class="dl-horizontal">
+                    <dt>
+                        @Html.DisplayNameFor(model => model.BienTheSanPham.SKU)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.BienTheSanPham.SKU)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Kho.TenKho)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Kho.TenKho)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.SoLuong)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.SoLuong)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.NgayCapNhat)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.NgayCapNhat)
+                    </dd>
+
+                </dl>
+                @using (Html.BeginForm())
+                {
+                    @Html.AntiForgeryToken()
+
+                    <div class="form-actions no-color">
+                        <button type="button" class="btn btn-danger btnXoa" data-id="@Model.TonKhoId">Xóa</button>
+                        <a href="@Url.Action("Index")" class="btn btn-dark">Quay lại</a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<div id="thongBaoXoa" class="mt-2"></div>
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            $(".btnXoa").click(function () {
+                var id = $(this).data("id");
+
+                if (!confirm("Bạn có chắc chắn muốn xóa tồn kho này?")) {
+                    return; // nếu bấm Cancel thì thoát luôn
+                }
+
+                $.ajax({
+                    url: '@Url.Action("Delete", "TonKhoes")',
+                    type: 'POST',
+                    data: { id: id },
+                    success: function (res) {
+                        if (res.success) {
+                            $("#thongBaoXoa").html("<div class='alert alert-success'>" + res.message + "</div>");
+                            setTimeout(function () {
+                                window.location.href = '@Url.Action("Index", "TonKhoes")';
+                            }, 1000);
+                        } else {
+                            $("#thongBaoXoa").html("<div class='alert alert-danger'>" + res.message + "</div>");
+                        }
+                    },
+                    error: function () {
+                        $("#thongBaoXoa").html("<div class='alert alert-danger'>Có lỗi xảy ra khi xóa tồn kho.</div>");
+                    }
+                });
+            });
+        });
+    </script>
+}
+
+
+

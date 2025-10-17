@@ -1,0 +1,49 @@
+﻿@model IEnumerable<DoAnChuyenNganh.Models.EF.DanhMuc>
+
+@if (Model != null && Model.Any())
+{
+    <ul class="navbar_menu">
+        <!-- Trang chủ -->
+        <li><a href="@Url.Action("Index", "Home")">Trang chủ</a></li>
+
+        @foreach (var item in Model)
+        {
+            if (item.DanhMuc1 != null && item.DanhMuc1.Any())
+            {
+                <li class="dropdown">
+                    <a href="/san-pham/@item.Slug">@item.TenDanhMuc <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        @foreach (var child in item.DanhMuc1)
+                        {
+                            <li><a href="/san-pham/@child.Slug">@child.TenDanhMuc</a></li>
+                        }
+                    </ul>
+                </li>
+            }
+            else
+            {
+                <li><a href="/san-pham/@item.Slug">@item.TenDanhMuc</a></li>
+            }
+        }
+        <!-- Tin tức -->
+        <li><a href="@Url.Action("Index", "TinTuc")">Tin tức</a></li>
+
+        <!-- Giới thiệu -->
+        <li><a href="@Url.Action("About", "Home")">Giới thiệu</a></li>
+
+        <!-- Liên hệ -->
+        <li><a href="@Url.Action("Contact", "Home")">Liên hệ</a></li>
+    </ul>
+}
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@400;500&display=swap" rel="stylesheet">
+<style>
+    h1, h2, h3 {
+        font-family: 'Playfair Display', serif;
+        letter-spacing: 0.5px;
+    }
+
+    body {
+        font-family: 'Poppins', sans-serif;
+    }
+</style>

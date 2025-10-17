@@ -1,0 +1,182 @@
+﻿@model DoAnChuyenNganh.Models.EF.DanhMuc
+
+@{
+    ViewBag.Title = "Delete";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+
+@section naviheader
+{
+    <!-- Left navbar links -->
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/admin/home" class="nav-link">Trang chủ</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/admin/danhmucs" class="nav-link">Danh mục</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="#" class="nav-link">Xóa</a>
+        </li>
+    </ul>
+}
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Xóa danh mục sản phẩm</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="/admin/danhmucs/">Danh mục</a></li>
+                    <li class="breadcrumb-item active">Xóa</li>
+                </ol>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<!-- Main content -->
+<section class="content">
+
+    <!-- Default box -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Thông tin xóa danh mục</h3>
+
+        </div>
+        <div class="card-body">
+            <div class="bs-stepper-content">
+                <dl class="dl-horizontal">
+                    <dt>
+                        Danh mục cha
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.DanhMuc2.TenDanhMuc)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.TenDanhMuc)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.TenDanhMuc)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Slug)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.Slug)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.MoTa)
+                    </dt>
+
+                    <dd>
+                        @Html.Raw(Model.MoTa)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.TrangThai)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.TrangThai)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.NgayTao)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.NgayTao)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.NgayCapNhat)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.NgayCapNhat)
+                    </dd>
+
+                </dl>
+                @using (Html.BeginForm())
+                {
+                    @Html.AntiForgeryToken()
+
+                    <div class="form-actions no-color">
+                        <button type="button" class="btn btn-danger btnXoa" data-id="@Model.DanhMucId">Xóa</button>
+
+                        <a href="@Url.Action("Index")" class="btn btn-dark">Quay lại</a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<div id="thongBaoXoa" class="mt-2"></div>
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            $(".btnXoa").click(function () {
+                var id = $(this).data("id");
+
+                $.ajax({
+                    url: '@Url.Action("Delete", "DanhMucs")',
+                    type: 'POST',
+                    data: { id: id },
+                    success: function (res) {
+                        if (res.success) {
+                            $("#thongBaoXoa").html("<div class='alert alert-success'>" + res.message + "</div>");
+                            setTimeout(function () {
+                                window.location.href = '@Url.Action("Index", "DanhMucs")';
+                            }, 1000);
+                        }
+                        else {
+                            if (res.hasChild) {
+                                // Nếu có con thì hỏi xác nhận
+                                if (confirm(res.message)) {
+                                    $.ajax({
+                                        url: '@Url.Action("Delete", "DanhMucs")',
+                                        type: 'POST',
+                                        data: { id: id, forceDelete: true },
+                                        success: function (res2) {
+                                            if (res2.success) {
+                                                $("#thongBaoXoa").html("<div class='alert alert-success'>" + res2.message + "</div>");
+                                                //quay về index trong 1s (1000ms)
+                                                setTimeout(function () {
+                                                    window.location.href = '@Url.Action("Index", "DanhMucs")';
+                                                }, 1000);
+                                            } else {
+                                                $("#thongBaoXoa").html("<div class='alert alert-danger'>" + res2.message + "</div>");
+                                            }
+                                        }
+                                    });
+                                }
+                            } else {
+                                $("#thongBaoXoa").html("<div class='alert alert-danger'>" + res.message + "</div>");
+                            }
+                        }
+                    },
+                    error: function () {
+                        $("#thongBaoXoa").html("<div class='alert alert-danger'>Lỗi khi gửi yêu cầu xóa.</div>");
+                    }
+                });
+            });
+        });
+    </script>
+}
+

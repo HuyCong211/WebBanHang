@@ -1,0 +1,271 @@
+﻿@model DoAnChuyenNganh.Models.EF.SanPham
+
+@{
+    ViewBag.Title = "Thêm mới sản phẩm";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+
+
+@section naviheader
+{
+    <!-- Left navbar links -->
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/admin/home" class="nav-link">Trang chủ</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/admin/sanphams" class="nav-link">Sản phẩm</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="#" class="nav-link">Thêm mới</a>
+        </li>
+    </ul>
+}
+
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Thêm mới sản phẩm</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="/admin/sanphams/">Sản phẩm</a></li>
+                    <li class="breadcrumb-item active">Thêm mới</li>
+                </ol>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+
+
+<!-- Main content -->
+<section class="content">
+    <!-- Default box -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Thông tin thêm mới sản phẩm</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-12">
+                    @using (Html.BeginForm("Create", "SanPhams", FormMethod.Post, new { id = "formThem" }))
+                    {
+                        @Html.AntiForgeryToken()
+
+                        <div class="card">
+                            <div class="card-header p-2">
+                                <ul class="nav nav-pills">
+                                    <li class="nav-item"><a class="nav-link active" href="#activity" data-toggle="tab">Thông tin chung</a></li>
+                                </ul>
+                            </div><!-- /.card-header -->
+                            <div class="card-body">
+                                <div class="tab-content">
+                                    <div class="active tab-pane" id="activity">
+                                        <div class="form-horizontal">
+                                            <h4>Sản phẩm</h4>
+                                            <hr />
+                                            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                                            <div class="form-group">
+                                                @Html.LabelFor(model => model.MaSanPham, htmlAttributes: new { @class = "control-label col-md-2" })
+                                                <div class="col-md-10">
+                                                    @Html.EditorFor(model => model.MaSanPham, new { htmlAttributes = new { @class = "form-control", @id = "txtMaSP", @placeholder = "Nhập mã sản phẩm..." } })
+                                                    @Html.ValidationMessageFor(model => model.MaSanPham, "", new { @class = "text-danger" })
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                @Html.LabelFor(model => model.TenSanPham, htmlAttributes: new { @class = "control-label col-md-2" })
+                                                <div class="col-md-10">
+                                                    @Html.EditorFor(model => model.TenSanPham, new { htmlAttributes = new { @class = "form-control", @id = "txtTenSP", @placeholder = "Nhập tên sản phẩm..." } })
+                                                    @Html.ValidationMessageFor(model => model.TenSanPham, "", new { @class = "text-danger" })
+                                                </div>
+                                            </div>
+
+
+                                            <div class="form-group">
+                                                @Html.LabelFor(model => model.MoTaNgan, htmlAttributes: new { @class = "control-label col-md-2" })
+                                                <div class="col-md-10">
+                                                    @Html.TextAreaFor(model => model.MoTaNgan, new { @class = "form-control", @id = "txtMoTaNgan", @placeholder = "Nhập mô tả ngắn..." })
+                                                    @Html.ValidationMessageFor(model => model.MoTaNgan, "", new { @class = "text-danger" })
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                @Html.LabelFor(model => model.MoTaChiTiet, htmlAttributes: new { @class = "control-label col-md-2" })
+                                                <div class="col-md-10">
+                                                    @Html.TextAreaFor(model => model.MoTaChiTiet, new { @class = "form-control", @id = "txtMoTaChiTiet", @placeholder = "Nhập mô tả chi tiết..." })
+                                                    @Html.ValidationMessageFor(model => model.MoTaChiTiet, "", new { @class = "text-danger" })
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                @Html.LabelFor(model => model.GiaBan, htmlAttributes: new { @class = "control-label col-md-2" })
+                                                <div class="col-md-10">
+                                                    @Html.EditorFor(model => model.GiaBan, new { htmlAttributes = new { @class = "form-control", @placeholder = "Nhập giá bán..." } })
+                                                    @Html.ValidationMessageFor(model => model.GiaBan, "", new { @class = "text-danger" })
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                @Html.LabelFor(model => model.GiaGoc, htmlAttributes: new { @class = "control-label col-md-2" })
+                                                <div class="col-md-10">
+                                                    @Html.EditorFor(model => model.GiaGoc, new { htmlAttributes = new { @class = "form-control", @placeholder = "Nhập giá gốc..." } })
+                                                    @Html.ValidationMessageFor(model => model.GiaGoc, "", new { @class = "text-danger" })
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                @Html.LabelFor(model => model.DanhMucId, "Danh mục", htmlAttributes: new { @class = "control-label col-md-2" })
+                                                <div class="col-md-10">
+                                                    @Html.DropDownList("DanhMucId", null, htmlAttributes: new { @class = "form-control" })
+                                                    @Html.ValidationMessageFor(model => model.DanhMucId, "", new { @class = "text-danger" })
+                                                </div>
+                                            </div>
+
+
+                                            <div class="form-group">
+                                                @Html.LabelFor(model => model.TrangThai, htmlAttributes: new { @class = "control-label col-md-2" })
+                                                <div class="col-md-10">
+                                                    @Html.DropDownListFor(model => model.TrangThai, new List<SelectListItem>
+                                                    {
+                                                        new SelectListItem { Text = "Nháp", Value = "0" },
+                                                        new SelectListItem { Text = "Đang bán", Value = "1" },
+                                                        new SelectListItem { Text = "Hết hàng", Value = "2" },
+                                                        new SelectListItem { Text = "Hủy", Value = "3" }
+                                                    }, new { @class = "form-control" })
+                                                    @Html.ValidationMessageFor(model => model.TrangThai, "", new { @class = "text-danger" })
+                                                </div>
+                                            </div>
+
+
+                                            <div class="form-group">
+                                                <div class="col-md-offset-2 col-md-10">
+                                                    <button type="submit" class="btn btn-primary">Lưu</button>
+                                                    <a href="/admin/sanphams" class="btn btn-danger">Quay lại</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- /.tab-content -->
+                            </div><!-- /.card-body -->
+                        </div>
+                        <!-- /.card -->
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+
+
+<div id="thongBaoThem" class="mt-3"></div>
+@section scripts{
+    <script>
+        $(function () {
+            $("#formThem").submit(function (them) {
+                them.preventDefault();
+
+                // CKEditor update
+                for (instance in CKEDITOR.instances) {
+                    CKEDITOR.instances[instance].updateElement();
+                }
+                // Kiểm tra độ dài Mã sản phẩm
+                var moTa = $("#txtMaSP").val();
+                if (moTa.length > 50) {
+                    $("#thongBaoThem").html("<div class='alert alert-danger'>Mã sản phẩm không được vượt quá 50 ký tự!</div>");
+                    return;
+                }
+                // Kiểm tra độ dài Tên sản phẩm
+                var moTa = $("#txtTenSP").val();
+                if (moTa.length > 300) {
+                    $("#thongBaoThem").html("<div class='alert alert-danger'>Tên sản phẩm không được vượt quá 300 ký tự!</div>");
+                    return;
+                }
+
+
+                // Kiểm tra độ dài Mô tả ngắn
+                var moTa = $("#txtMoTaNgan").val();
+                if (moTa.length > 500) {
+                    $("#thongBaoThem").html("<div class='alert alert-danger'>Mô tả không được vượt quá 500 ký tự!</div>");
+                    return;
+                }
+                $.ajax({
+                    url: '@Url.Action("Create", "SanPhams")',
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function (res) {
+                        if (res.success) {
+                            //nếu server trả về thành công (res.success == true)
+                            $("#thongBaoThem").html("<div class = 'alert alert-success'>" + res.message + "</div>");
+                            //Xóa các input bên trong form có id là formThem
+                            $("#formThem .form-control").val('');
+
+                            // Reset input + CKEditor
+                            $("#formThem .form-control").val('');
+                            if (CKEDITOR.instances['txtMaSP']) {
+                                CKEDITOR.instances['txtMaSP'].setData('');
+                            }
+                            // Reset input + CKEditor
+                            $("#formThem .form-control").val('');
+                            if (CKEDITOR.instances['txtTenSP']) {
+                                CKEDITOR.instances['txtTenSP'].setData('');
+                            }
+                            // Reset input + CKEditor
+                            $("#formThem .form-control").val('');
+                            if (CKEDITOR.instances['txtSlug']) {
+                                CKEDITOR.instances['txtSlug'].setData('');
+                            }
+                            // Reset input + CKEditor
+                            $("#formThem .form-control").val('');
+                            if (CKEDITOR.instances['txtMoTaNgan']) {
+                                CKEDITOR.instances['txtMoTaNgan'].setData('');
+                            }
+
+                            //quay lại index sau 1s
+                            setTimeout(function () {
+                                window.location.href = '@Url.Action("Index", "SanPhams")';
+                            }, 1000);
+                        }
+                        else {
+                            //Nếu server trả về thất bại (res.success == false)
+                            $("#thongBaoThem").html("<div class = 'alert alert-danger'>" + res.message + "</div>");
+                        }
+                    },
+                    error: function () {
+                        //Nếu có lỗi trong quá trình gửi Ajax
+                        $("#thongBaoThem").html("<div class = 'alert alert-danger'> Lỗi trong quá trình gửi. </div>");
+                    }
+                });
+                    return false;
+            });
+            //xóa thông báo khi người dùng gõ lại
+            $("#formThem input, #formThem textarea").on("input", function () {
+                $("#thongBaoThem").empty();
+            });
+
+            // Khởi tạo CKEditor
+            CKEDITOR.replace('txtMoTaChiTiet', {
+                customConfig: '/content/ckeditor/config.js',
+                extraAllowedContent: 'span',
+            });
+            // Khởi tạo CKEditor
+            CKEDITOR.replace('txtMoTaNgan', {
+                customConfig: '/content/ckeditor/config.js',
+                extraAllowedContent: 'span',
+            });
+        });
+    </script>
+}
+
+

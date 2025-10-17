@@ -1,0 +1,54 @@
+﻿@model DoAnChuyenNganh.Models.EF.DanhMuc
+@{
+    ViewBag.Title = "DeleteConfirmWithChildren";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+    var children = ViewBag.Children as List<DoAnChuyenNganh.Models.EF.DanhMuc>;
+}
+
+
+<br />
+<h2 style="font-weight:bold; color:red; text-align:center">XÁC NHẬN XÓA</h2>
+
+<div class="alert alert-warning mx-auto text-center mt-5" style="max-width: 1000px; margin: 0 auto; text-align: center">
+    @{
+        var childNames = children != null ? string.Join(", ", children.Select(c => c.TenDanhMuc)) : "";
+    }
+    Danh mục "<strong>@Model.TenDanhMuc</strong>" có chứa các mục con: @childNames.
+    <br />
+    Bạn có chắc chắn muốn xóa toàn bộ (bao gồm danh mục cha và các mục con) không?
+</div>
+<br />
+<div style="text-align:center">
+    <button id="btnForceDelete" class="btn btn-danger">Có, xóa tất cả</button>
+    <a href="@Url.Action("Index", "DanhMucs")" class="btn btn-default">Không, quay về</a>
+
+</div>
+@section scripts{
+    <script>
+    $(document).ready(function () {
+        $("#btnForceDelete").click(function () {
+            $.ajax({
+                url: '@Url.Action("Delete", "DanhMucs", new { area = "Admin" })',
+                type: 'POST',
+                data: {
+                    id: '@Model.DanhMucId',
+                    forceDelete: true
+                },
+                success: function (res) {
+                    if (res.success) {
+                        alert(res.message);
+                        window.location.href = '@Url.Action("Index", "DanhMucs")';
+                    } else {
+                        alert(res.message);
+                    }
+                },
+                error: function () {
+                    alert("Có lỗi xảy ra!");
+                }
+            });
+        });
+    });
+    </script>
+}
+
+

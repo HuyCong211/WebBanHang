@@ -1,0 +1,17 @@
+﻿@{
+    ViewBag.Title = "Thanh toán thất bại";
+}
+
+<h2 style="color:red">Thanh toán thất bại</h2>
+
+@if (TempData["Error"] != null)
+{
+    <p>@TempData["Error"]</p>
+}
+
+@if (ViewBag.ResponseCode != null)
+{
+    <p>Mã lỗi: <strong>@ViewBag.ResponseCode</strong></p>
+}
+
+<p><a href="@Url.Action("Index", "GioHangs")">← Quay lại giỏ hàng</a></p>

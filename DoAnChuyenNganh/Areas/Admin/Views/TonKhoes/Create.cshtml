@@ -1,0 +1,202 @@
+﻿@model DoAnChuyenNganh.Models.EF.TonKho
+
+@{
+    ViewBag.Title = "Thêm tồn kho";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+
+@section naviheader
+{
+    <!-- Left navbar links -->
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/admin/home" class="nav-link">Trang chủ</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/admin/tonkhoes" class="nav-link">TỒN KHO</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="#" class="nav-link">Thêm mới</a>
+        </li>
+    </ul>
+}
+
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Thêm mới tồn kho</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="/admin/tonkhoes/">TỒN KHO</a></li>
+                    <li class="breadcrumb-item active">Thêm mới</li>
+                </ol>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+
+
+<!-- Main content -->
+<section class="content">
+    <!-- Default box -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Thông tin thêm mới tồn kho</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-12">
+
+                    @using (Html.BeginForm())
+                    {
+                        @Html.AntiForgeryToken()
+
+                        <div class="form-horizontal">
+                            <h4>Tồn kho</h4>
+                            <hr />
+                            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                            @*<div class="form-group">
+                                    @Html.LabelFor(model => model.BienTheId, "BienTheId", htmlAttributes: new { @class = "control-label col-md-2" })
+                                    <div class="col-md-10">
+                                        @Html.DropDownList("BienTheId", null, htmlAttributes: new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.BienTheId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>*@
+                            <div class="form-group">
+                                <label>Chọn biến thể sản phẩm</label>
+                                <select id="BienTheIds" name="BienTheIds" multiple="multiple" class="form-control select2-ajax" style="width:100%"></select>
+                                @*<span class="text-muted">Giữ Ctrl hoặc Shift để chọn nhiều biến thể.</span>*@
+                            </div>
+
+
+                            <div id="productInfo" class="alert alert-info" style="display:none;"></div>
+
+
+                            <div class="form-group mt-2">
+                                <label>Chọn kho</label>
+                                @Html.DropDownList("KhoId", (SelectList)ViewBag.KhoId, "-- Chọn kho --", new { @class = "form-control select2" })
+                            </div>
+
+                            @*<div class="form-group">
+                                    @Html.LabelFor(model => model.KhoId, "KhoId", htmlAttributes: new { @class = "control-label col-md-2" })
+                                    <div class="col-md-10">
+                                        @Html.DropDownList("KhoId", null, htmlAttributes: new { @class = "form-control" })
+                                        @Html.ValidationMessageFor(model => model.KhoId, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>*@
+
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.SoLuong, htmlAttributes: new { @class = "control-label col-md-2" })
+                                <div class="col-md-10">
+                                    @Html.EditorFor(model => model.SoLuong, new { htmlAttributes = new { @class = "form-control" } })
+                                    @Html.ValidationMessageFor(model => model.SoLuong, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+
+                            @*<div class="form-group">
+                                    @Html.LabelFor(model => model.NgayCapNhat, htmlAttributes: new { @class = "control-label col-md-2" })
+                                    <div class="col-md-10">
+                                        @Html.EditorFor(model => model.NgayCapNhat, new { htmlAttributes = new { @class = "form-control" } })
+                                        @Html.ValidationMessageFor(model => model.NgayCapNhat, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>*@
+
+                            <div class="form-group">
+                                <div class="col-md-offset-2 col-md-10">
+                                    <button type="submit" class="btn btn-primary">Lưu</button>
+                                    <a href="/admin/tonkhoes" class="btn btn-danger">Quay lại</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Select2 AJAX cho biến thể (cho phép nhiều chọn)
+            $('#BienTheIds').select2({
+                placeholder: 'Nhập mã SKU hoặc tên sản phẩm...',
+                multiple: true,
+                ajax: {
+                    url: '/Admin/TonKhoes/GetBienTheSanPhams',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return { q: params.term };
+                    },
+                    processResults: function (data) {
+                        return { results: data.results };
+                    },
+                    cache: true
+                }
+            });
+
+            // Hiển thị thông tin biến thể đã chọn
+            $('#BienTheIds').on('change', function () {
+                var selected = $(this).select2('data');
+                var html = '<ul>';
+                $.each(selected, function (i, item) {
+                    html += '<li>' + item.text + '</li>';
+                });
+                html += '</ul>';
+                $('#productInfo').html('<b>Đã chọn:</b> ' + html).fadeIn();
+            });
+
+            // Select2 cho Kho
+            $('#KhoId').select2({
+                placeholder: 'Chọn kho lưu trữ'
+            });
+
+
+            // 🧠 Kiểm tra trước khi gửi form
+            $('form').on('submit', function (e) {
+                var bienTheIds = $('#BienTheIds').val();
+                var khoId = $('#KhoId').val();
+                var soLuong = $('#SoLuong').val();
+
+                // Reset thông báo cũ
+                $('.alert-danger').remove();
+
+                var errorMessages = [];
+
+                if (!bienTheIds || bienTheIds.length === 0) {
+                    errorMessages.push("Mã biến thể không được để trống");
+                }
+
+                if (!khoId || khoId === "") {
+                    errorMessages.push("Kho không được để trống");
+                }
+
+                if (!soLuong || soLuong.trim() === "" || isNaN(soLuong)) {
+                    errorMessages.push("Số lượng không được để trống hoặc không hợp lệ");
+                }
+
+                if (errorMessages.length > 0) {
+                    e.preventDefault(); // chặn submit
+                    var alertBox = '<div class="alert alert-danger mt-3"><ul>';
+                    errorMessages.forEach(function (msg) {
+                        alertBox += '<li>' + msg + '</li>';
+                    });
+                    alertBox += '</ul></div>';
+                    $('.card-body').prepend(alertBox);
+                    $('html, body').animate({ scrollTop: 0 }, 'fast');
+                    return false;
+                }
+            });
+        });
+    </script>
+}
+

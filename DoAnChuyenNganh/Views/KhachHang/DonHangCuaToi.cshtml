@@ -1,0 +1,65 @@
+﻿@model IEnumerable<DoAnChuyenNganh.Models.EF.DonHang>
+@{
+    ViewBag.Title = "Đơn hàng của tôi";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="container" style="margin-top:150px; margin-bottom:100px;">
+    <h2 class="fw-bold mb-4 text-center">
+        <i class="fas fa-list"></i> Đơn hàng của tôi
+    </h2>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info text-center">
+            Chưa có đơn hàng nào. @Html.ActionLink("Tra cứu đơn hàng", "TraCuu", "KhachHang")
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive shadow-sm rounded-4">
+            <table class="table table-bordered align-middle text-center">
+                <thead class="table-light">
+                    <tr>
+                        <th>Mã đơn</th>
+                        <th>Ngày đặt</th>
+                        <th>Tổng tiền</th>
+                        <th>Trạng thái</th>
+                        <th>Phương thức</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><strong>@item.MaDonHang</strong></td>
+                            <td>@(item.NgayTao?.ToString("dd/MM/yyyy HH:mm"))</td>
+                            <td>@item.TongTien.ToString("N0") đ</td>
+                            <td>
+                                @switch (item.TrangThai)
+                                {
+                                    case 0:<span class="badge bg-warning text-dark">Chờ xác nhận</span>; break;
+                                    case 1: <span class="badge bg-info text-white">Đã xác nhận</span>; break;
+                                    case 2: <span class="badge bg-primary">Đang giao</span>; break;
+                                    case 3: <span class="badge bg-success">Hoàn tất</span>; break;
+                                    case 4: <span class="badge bg-danger">Đã huỷ</span>; break;
+                                    default: <span class="badge bg-secondary">Không xác định</span>; break;
+                                }
+                            </td>
+                            <td>
+                                @(item.PhuongThucThanhToanId == 1 ? "COD" : item.PhuongThucThanhToanId == 2 ? "VNPay" : "Chuyển khoản")
+                            </td>
+                            <td>
+                                <a href="@Url.Action("ChiTietDonHang", "KhachHang", new { id = item.DonHangId })"
+                                   class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                                    <i class="fas fa-eye"></i> Xem chi tiết
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+

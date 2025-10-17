@@ -1,0 +1,286 @@
+﻿  <!-- Sidebar -->
+<div class="sidebar">
+    <!-- Sidebar user (optional) -->
+    <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+        <div class="image">
+            <img src="~/Content/Clients/dist/img/admin.jpg" class="img-circle elevation-2" alt="User Image" />
+        </div>
+        @using Microsoft.AspNet.Identity
+        @{
+            var fullName = User.Identity.IsAuthenticated
+                ? ((System.Security.Claims.ClaimsIdentity)User.Identity)
+                    .FindFirst("Fullname")?.Value
+                    ?? User.Identity.GetUserName()
+                : "Admin";
+        }
+
+        <div class="dropdown ml-2">
+            <a href="#" class="d-block text-white dropdown-toggle" id="adminMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                @fullName
+            </a>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="adminMenu">
+                <a class="dropdown-item" href="/Admin/AdminAccount/LogOff" onclick="event.preventDefault(); document.getElementById('logoutForm').submit();">
+                    <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                </a>
+                <form id="logoutForm" action="/Admin/AdminAccount/LogOff" method="post" class="d-none">
+                    @Html.AntiForgeryToken()
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar Menu -->
+    <nav class="mt-2">
+        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+            <!-- Trang chủ -->
+            <li class="nav-item">
+                <a href="/admin/home" class="nav-link">
+                    <i class="nav-icon fas fa-home"></i>
+                    <p>Trang chủ</p>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="nav-icon fas fa-tshirt"></i>
+                    <p>
+                        Quản lý sản phẩm
+                        <i class="right fas fa-angle-left"></i>
+                    </p>
+                </a>
+                <ul class="nav nav-treeview">
+                    <li class="nav-item">
+                        <a href="/admin/DanhMucs" class="nav-link">
+                            <i class="fas fa-layer-group nav-icon"></i>
+                            <p>Danh mục</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/admin/sanphams" class="nav-link">
+                            <i class="fas fa-cube nav-icon"></i>
+                            <p>Sản phẩm</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/admin/anhsanphams" class="nav-link">
+                            <i class="far fa-image nav-icon"></i>
+                            <p>Ảnh sản phẩm</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/admin/bienthesanphams" class="nav-link">
+                            <i class="fas fa-random nav-icon"></i>
+                            <p>Biến thể sản phẩm</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/admin/thuoctinhs" class="nav-link">
+                            <i class="fas fa-tags nav-icon"></i>
+                            <p>Thuộc tính</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/admin/giatrithuoctinhs" class="nav-link">
+                            <i class="fas fa-clipboard-list nav-icon"></i>
+                            <p>Giá trị thuộc tính</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/admin/khuyenmais" class="nav-link">
+                            <i class="fas fa-percent nav-icon"></i>
+                            <p>Khuyến mại</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="@Url.Action("Index", "BinhLuan", new { area = "Admin" })" class="nav-link">
+                            <i class="fa fa-comments nav-icon"></i>
+                            <p>Quản lý bình luận</p>
+                        </a>
+                    </li>
+
+                </ul>
+            </li>
+
+
+            <!-- Quản lý kho -->
+            <li class="nav-item has-treeview">
+                <a href="#" class="nav-link">
+                    <i class="nav-icon fas fa-warehouse"></i>
+                    <p>
+                        Quản lý kho
+                        <i class="right fas fa-angle-left"></i>
+                    </p>
+                </a>
+                <ul class="nav nav-treeview">
+                    <li class="nav-item">
+                        <a href="/admin/khoes" class="nav-link">
+                            <i class="fas fa-building nav-icon"></i>
+                            <p>Kho</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/admin/TonKhoes" class="nav-link">
+                            <i class="fas fa-archive nav-icon"></i>
+                            <p>Tồn kho</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/admin/LichSuTonKhoes" class="nav-link">
+                            <i class="fas fa-history nav-icon"></i>
+                            <p>Lịch sử tồn kho</p>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Đơn hàng -->
+            <li class="nav-item">
+                <a href="/admin/donhangs" class="nav-link">
+                    <i class="nav-icon fas fa-shopping-cart"></i>
+                    <p>Quản lý đơn hàng</p>
+                </a>
+            </li>
+
+            <!-- Tin tức -->
+            <li class="nav-item has-treeview">
+                <a href="#" class="nav-link">
+                    <i class="nav-icon fas fa-newspaper"></i>
+                    <p>
+                        Quản lý tin tức
+                        <i class="right fas fa-angle-left"></i>
+                    </p>
+                </a>
+                <ul class="nav nav-treeview">
+                    <li class="nav-item">
+                        <a href="/admin/tintucs" class="nav-link">
+                            <i class="far fa-file-alt nav-icon"></i>
+                            <p>Tin tức</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/admin/hinhanhtintucs" class="nav-link">
+                            <i class="far fa-image nav-icon"></i>
+                            <p>Hình ảnh tin tức</p>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Tài khoản -->
+            <li class="nav-item">
+                <a href="/admin/users" class="nav-link">
+                    <i class="nav-icon fas fa-users"></i>
+                    <p>Quản lý tài khoản</p>
+                </a>
+            </li>
+
+            <!-- Thanh toán -->
+            <li class="nav-item">
+                <a href="/admin/phuongthucthanhtoans" class="nav-link">
+                    <i class="nav-icon fas fa-credit-card"></i>
+                    <p>Phương thức thanh toán</p>
+                </a>
+            </li>
+
+            <!-- Thống kê -->
+            <li class="nav-item">
+                <a href="/admin/thongke" class="nav-link">
+                    <i class="nav-icon fas fa-chart-line"></i>
+                    <p>Thống kê</p>
+                </a>
+            </li>
+            <!-- Cấu hình -->
+            <li class="nav-item has-treeview">
+                <a href="#" class="nav-link">
+                    <i class="nav-icon fas fa-cogs"></i>
+                    <p>
+                        Quản lý cấu hình
+                        <i class="right fas fa-angle-left"></i>
+                    </p>
+                </a>
+                <ul class="nav nav-treeview">
+                    <li class="nav-item">
+                        <a href="/admin/cauhinh/EditHotline" class="nav-link">
+                            <i class="fas fa-phone-alt nav-icon"></i>
+                            <p>Hotline</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/admin/cauhinh/EditEmail" class="nav-link">
+                            <i class="fas fa-envelope nav-icon"></i>
+                            <p>Email</p>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+        </ul>
+    </nav>
+    <!-- /.sidebar-menu -->
+</div>
+<!-- /.sidebar -->
+
+<style>
+    /* Dropdown trong sidebar user */
+    .sidebar .dropdown-menu {
+        position: absolute !important;
+        top: 32px !important; /* 👈 sát hơn với tên admin */
+        left: 5px !important; /* 👈 căn giữa hơn so với avatar + tên */
+        z-index: 1050 !important;
+        background-color: transparent; /* trong suốt nền chính */
+        border: none;
+        min-width: 160px;
+        display: none;
+        box-shadow: none;
+    }
+
+    /* Khi dropdown mở */
+    .sidebar .dropdown.show .dropdown-menu {
+        display: block !important;
+    }
+
+    /* Style cho nút đăng xuất */
+    .sidebar .dropdown-menu a {
+        display: block;
+        background-color: #dc3545; /* 🔴 nền đỏ */
+        color: #fff !important;
+        padding: 8px 12px;
+        border-radius: 6px;
+        text-align: center;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+
+        .sidebar .dropdown-menu a:hover {
+            background-color: #bd2130 !important; /* đỏ đậm khi hover */
+        }
+
+    /* Giúp dropdown hiển thị tràn ra ngoài sidebar */
+    .sidebar,
+    .main-sidebar,
+    .user-panel {
+        overflow: visible !important;
+    }
+
+
+
+/*     Căn lề cho menu cấp 2 */
+    .nav-sidebar .nav-treeview {
+        padding-left: 20px;  /*Lùi vào*/ 
+        background-color: #2f3542;  /*Tùy chọn: làm nền hơi tối hơn menu cha */
+        border-left: 2px solid #444;  /*Tùy chọn: tạo đường phân cấp nhẹ*/ 
+    }
+
+        /* Làm nhỏ hơn để phân biệt */
+        .nav-sidebar .nav-treeview > .nav-item > .nav-link {
+            font-size: 14px;
+            padding-left: 35px;  /*Dịch thêm icon và text */
+        }
+
+        /* Làm icon cấp 2 nhỏ hơn */
+        .nav-sidebar .nav-treeview .nav-icon {
+            font-size: 13px;
+            opacity: 0.8;
+        }
+
+</style>

@@ -1,0 +1,257 @@
+﻿@model DoAnChuyenNganh.Models.EF.BienTheSanPham
+
+@{
+    ViewBag.Title = "Thêm mới biến thể sản phẩm";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+
+
+@section naviheader
+{
+    <!-- Left navbar links -->
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/admin/home" class="nav-link">Trang chủ</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/admin/bienthesanphams" class="nav-link">Biến thể sản phẩm</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="#" class="nav-link">Thêm mới</a>
+        </li>
+    </ul>
+}
+
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Thêm mới biến thể sản phẩm</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="/admin/bienthesanphams/">Biến thể sản phẩm</a></li>
+                    <li class="breadcrumb-item active">Thêm mới</li>
+                </ol>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+
+
+<!-- Main content -->
+<section class="content">
+    <!-- Default box -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Thông tin thêm mới biến thể sản phẩm</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-12">
+
+                    @using (Html.BeginForm("Create", "BienTheSanPhams", FormMethod.Post, new { id = "formThem" }))
+                    {
+                        @Html.AntiForgeryToken()
+
+                        <div class="form-horizontal">
+                            <h4>Biến thể sản phẩm</h4>
+                            <hr />
+                            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                            <div class="form-group">
+                                @Html.Label("Sản phẩm", htmlAttributes: new { @class = "control-label col-md-2" })
+                                <div class="col-md-10">
+                                    @Html.ListBox("sanPhamIds", ViewBag.SanPhamIds as MultiSelectList,
+                                        new { @class = "form-control select2", @multiple = "multiple", @id = "ddlSanPhams" })
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.SKU, htmlAttributes: new { @class = "control-label col-md-2" })
+                                <div class="col-md-10">
+                                    @Html.EditorFor(model => model.SKU, new { htmlAttributes = new { @class = "form-control" } })
+                                    @Html.ValidationMessageFor(model => model.SKU, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.Gia, htmlAttributes: new { @class = "control-label col-md-2" })
+                                <div class="col-md-10">
+                                    @Html.EditorFor(model => model.Gia, new { htmlAttributes = new { @class = "form-control" } })
+                                    @Html.ValidationMessageFor(model => model.Gia, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.GiaKhuyenMai, htmlAttributes: new { @class = "control-label col-md-2" })
+                                <div class="col-md-10">
+                                    @Html.EditorFor(model => model.GiaKhuyenMai, new { htmlAttributes = new { @class = "form-control" } })
+                                    @Html.ValidationMessageFor(model => model.GiaKhuyenMai, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+
+                            @*<div class="form-group">
+                                @Html.LabelFor(model => model.MaVach, htmlAttributes: new { @class = "control-label col-md-2" })
+                                <div class="col-md-10">
+                                    @Html.EditorFor(model => model.MaVach, new { htmlAttributes = new { @class = "form-control" } })
+                                    @Html.ValidationMessageFor(model => model.MaVach, "", new { @class = "text-danger" })
+                                </div>
+                            </div>*@
+
+                            <div class="form-group">
+                                @Html.LabelFor(model => model.TrangThai, htmlAttributes: new { @class = "control-label col-md-2" })
+                                <div class="col-md-10">
+                                    <div class="checkbox">
+                                        @Html.EditorFor(model => model.TrangThai)
+                                        @Html.ValidationMessageFor(model => model.TrangThai, "", new { @class = "text-danger" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                @Html.Label("Thuộc tính", htmlAttributes: new { @class = "control-label col-md-2" })
+                                <div class="col-md-10">
+                                    @Html.ListBox("thuocTinhIds", ViewBag.ThuocTinhIds as MultiSelectList,
+                                        new { @class = "form-control select2", @multiple = "multiple", @id = "ddlThuocTinhs" })
+                                </div>
+                            </div>
+
+
+
+                            <div class="form-group">
+                                @Html.Label("Giá trị thuộc tính", htmlAttributes: new { @class = "control-label col-md-2" })
+                                <div class="col-md-10">
+                                    @Html.ListBox("giaTriThuocTinhIds", ViewBag.giaTriThuocTinhIds as MultiSelectList,
+                                                    new { @class = "form-control select2", @multiple = "multiple", @id = "ddlGiaTriThuocTinh" })
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-md-offset-2 col-md-10">
+                                    <button type="submit" class="btn btn-primary">Thêm</button>
+                                    <a href="/admin/bienthesanphams" class="btn btn-danger">Quay lại</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<div id="thongBaoThem" class="mt-3"></div>
+@section scripts{
+    <script>
+        $(function () {
+
+            $('#ddlSanPhams').select2({
+                placeholder: "Chọn sản phẩm",
+                allowClear: true
+            });
+
+
+            $('#ddlThuocTinhs').select2({
+                placeholder: "Chọn thuộc tính",
+                allowClear: true
+            });
+
+            $('#ddlGiaTriThuocTinh').select2({
+                placeholder: "Chọn giá trị thuộc tính",
+                allowClear: true
+            });
+
+
+            //$(document).ready(function () {
+            //    $('.select2').select2({
+            //        placeholder: "Chọn giá trị thuộc tính",
+            //        allowClear: true
+            //    });
+            //});
+
+            // Load giá trị thuộc tính theo thuộc tính
+            $("#ddlThuocTinhs").change(function () {
+                var thuocTinhIds = $(this).val(); // mảng id thuộc tính
+                if (thuocTinhIds && thuocTinhIds.length > 0) {
+                    $.ajax({
+                        url: '@Url.Action("GetGiaTriByThuocTinhs", "BienTheSanPhams")',
+                        type: 'POST',
+                        data: { ids: thuocTinhIds },
+                        traditional: true, // để gửi mảng về controller
+                        success: function (data) {
+                            var ddl = $("select[name='giaTriThuocTinhIds']");
+                            ddl.empty();
+                            $.each(data, function (i, item) {
+                                ddl.append($('<option/>', { value: item.Value, text: item.Text }));
+                            });
+                            ddl.trigger('change');
+                        }
+                    });
+                }
+            });
+
+            $("#formThem").submit(function (them) {
+                them.preventDefault();
+                $.ajax({
+                    url: '@Url.Action("Create", "BienTheSanPhams")',
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function (res) {
+                        if (res.success) {
+                            //nếu server trả về thành công (res.success == true)
+                            $("#thongBaoThem").html("<div class = 'alert alert-success'>" + res.message + "</div>");
+                            //Xóa các input bên trong form có id là formThem
+                            $("#formThem .form-control").val('');
+
+                            //quay lại index sau 1s
+                            setTimeout(function () {
+                                window.location.href = '@Url.Action("Index", "BienTheSanPhams")';
+                            }, 1000);
+                        }
+                        else {
+                            //Nếu server trả về thất bại (res.success == false)
+                            $("#thongBaoThem").html("<div class = 'alert alert-danger'>" + res.message + "</div>");
+                        }
+                    },
+                    error: function () {
+                        //Nếu có lỗi trong quá trình gửi Ajax
+                        $("#thongBaoThem").html("<div class = 'alert alert-danger'> Lỗi trong quá trình gửi. </div>");
+                    }
+                });
+            });
+            //xóa thông báo khi người dùng gõ lại
+            $("#formThem input, #formThem textarea").on("input", function () {
+                $("#thongBaoThem").empty();
+            });
+        });
+    </script>
+}
+
+@section styles {
+    <style>
+        .select2-selection__rendered {
+            display: flex !important;
+            flex-wrap: wrap !important;
+        }
+
+        .select2-selection__choice {
+            background: #007bff !important;
+            color: #fff !important;
+            border: none !important;
+            margin: 2px !important;
+            border-radius: 4px !important;
+        }
+    </style>
+}
+
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>

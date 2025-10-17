@@ -1,0 +1,125 @@
+﻿@model PagedList.IPagedList<DoAnChuyenNganh.Models.EF.PhuongThucThanhToan>
+@using PagedList.Mvc;
+
+@{
+    ViewBag.Title = "Danh sách phương thức thanh toán";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+
+@section naviheader
+{
+    <!-- Left navbar links -->
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/admin/home" class="nav-link">Trang chủ</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/admin/phuongthucthanhtoans" class="nav-link">Phương thức thanh toán</a>
+        </li>
+    </ul>
+}
+
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Quản lý phương thức thanh toán</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="/admin/home/">Trang chủ</a></li>
+                    <li class="breadcrumb-item active">Phương thức thanh toán</li>
+                </ol>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<!-- Main content -->
+<section class="content">
+
+    <!-- Default box -->
+    <div class="card">
+
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="card-title">Danh sách phương thức thanh toán</h3>
+        </div>
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <!-- Form tìm kiếm bên trái -->
+            <form method="get" action="@Url.Action("Index")" class="form-inline">
+                <input type="text" name="tim" value="@ViewBag.CurrentFilter"
+                       class="form-control mr-2" style="width:350px;" placeholder="Nhập tên phương thức" />
+                <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+            </form>
+
+            <!-- Nút bên phải -->
+            <div class="ml-auto">
+                <a href="/admin/phuongthucthanhtoans/create" class="btn btn-primary">Thêm mới</a>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>
+                            Tên phương thức
+                        </th>
+                        <th>
+                            Mô tả
+                        </th>
+                        <th>
+                            Trạng thái
+                        </th>
+                        <th> Thao tác</th>
+                    </tr>
+                </thead>
+                @{
+                    // Lấy vị trí bắt đầu của STT cho trang hiện tại
+                    int stt = (Model.PageNumber - 1) * Model.PageSize + 1;
+                }
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@stt</td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.TenPhuongThuc)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.MoTa)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Active)
+                                </td>
+                                <td>
+                                    @Html.ActionLink("Sửa", "Edit", new { id = item.PhuongThucId }) |
+                                    @Html.ActionLink("Chi tiết", "Details", new { id = item.PhuongThucId }) |
+                                    @Html.ActionLink("Xóa", "Delete", new { id = item.PhuongThucId })
+                                </td>
+                            </tr>
+                            stt++;
+                        }
+                    }
+                </tbody>
+            </table>
+            <br />
+            <div class="row">
+                <div class="col-12 text-center" style="margin-bottom:8px; font-weight:bold;">
+                    Trang @(Model.PageNumber) / @(Model.PageCount)
+                    @*<br />*@
+                    @Html.PagedListPager(Model, page => Url.Action("Index", new { page }))
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+

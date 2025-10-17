@@ -1,0 +1,363 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>KRIK Shop</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="Colo Shop Template">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="~/Content/assets/styles/bootstrap4/bootstrap.min.css">
+    @*<link href="~/Content/bootstrap.min.css" rel="stylesheet" />*@
+    <link href="~/Content/assets/plugins/font-awesome-4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" type="text/css" href="~/Content/assets/plugins/OwlCarousel2-2.2.1/owl.carousel.css">
+    <link rel="stylesheet" type="text/css" href="~/Content/assets/plugins/OwlCarousel2-2.2.1/owl.theme.default.css">
+    <link rel="stylesheet" type="text/css" href="~/Content/assets/plugins/OwlCarousel2-2.2.1/animate.css">
+    <link rel="stylesheet" type="text/css" href="~/Content/assets/plugins/jquery-ui-1.12.1.custom/jquery-ui.css">
+    <link rel="stylesheet" type="text/css" href="~/Content/assets/styles/main_styles.css">
+    <link rel="stylesheet" type="text/css" href="~/Content/assets/styles/responsive.css">
+    @*@Styles.Render("~/Content/css")*@
+    @Scripts.Render("~/bundles/modernizr")
+
+    <!-- Font cho toàn bộ website -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap&subset=vietnamese" rel="stylesheet">
+    <style>
+        /* Font toàn site */
+        * {
+            font-family: 'Inter', sans-serif !important;
+        }
+
+        /* Giữ font riêng cho icon Font Awesome */
+        .fa, .fas, .far, .fal, .fab {
+            font-family: 'FontAwesome' !important;
+        }
+
+        /* Tiêu đề đậm nét, rõ ràng */
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        /* Banner và quote có thể dùng đậm hơn */
+        .main_slider_content h1, .banner_category a {
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+    </style>
+
+
+
+
+</head>
+<body>
+    @Html.AntiForgeryToken()
+    <div class="super_container">
+
+        <!-- Header -->
+
+        <header class="header trans_300">
+
+            <!-- Top Navigation -->
+
+            <div class="top_nav">
+                <div class="container">
+                    <div class="row">
+
+                        @using DoAnChuyenNganh.Models.EF
+                        @{
+                            var context = new ApplicationDbContext();
+                            var hotline = context.CauHinhs.FirstOrDefault(x => x.KeyName == "Hotline");
+                            var email = context.CauHinhs.FirstOrDefault(x => x.KeyName == "Email");
+                        }
+                        <div class="col-md-3">
+                            <div class="top_nav_left">HOTLINE: @(hotline != null ? hotline.Value : "Chưa cấu hình")</div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="top_nav_left">EMAIL: @(email != null ? email.Value : "Chưa cấu hình")</div>
+                        </div>
+
+                        <div class="col-md-6 text-right">
+                            <div class="top_nav_right">
+                                <ul class="top_nav_menu">
+
+                                    <!-- Currency / Language / My Account -->
+                                    @using Microsoft.AspNet.Identity
+                                    @using DoAnChuyenNganh.Models
+                                    @{
+                                        string fullName = "";
+                                        if (Request.IsAuthenticated)
+                                        {
+                                            var userId = User.Identity.GetUserId();
+                                            using (var db = new ApplicationDbContext())
+                                            {
+                                                var user = db.Users.Find(userId);
+                                                if (user != null)
+                                                {
+                                                    fullName = !string.IsNullOrEmpty(user.Fullname) ? user.Fullname : user.UserName;
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    <li class="account">
+                                        @if (Request.IsAuthenticated)
+                                        {
+                                            <a href="#">
+                                                Hello, @fullName!
+
+                                                <i class="fa fa-angle-down"></i>
+                                            </a>
+                                            <ul class="account_selection">
+                                                <li>
+                                                    @using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm" }))
+                                                    {
+                                                        @Html.AntiForgeryToken()
+                                                        <a href="javascript:document.getElementById('logoutForm').submit()">
+                                                            <i class="fa fa-sign-out" aria-hidden="true"></i> Đăng xuất
+                                                        </a>
+                                                    }
+                                                </li>
+                                            </ul>
+                                        }
+                                        else
+                                        {
+                                            <a href="#">
+                                                My Account
+                                                <i class="fa fa-angle-down"></i>
+                                            </a>
+                                            <ul class="account_selection">
+                                                <li>
+                                                    <a href="@Url.Action("Login", "Account")">
+                                                        <i class="fa fa-sign-in" aria-hidden="true"></i> Sign In
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="@Url.Action("Register", "Account")">
+                                                        <i class="fa fa-user-plus" aria-hidden="true"></i> Register
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        }
+                                    </li>
+
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Navigation -->
+
+            <div class="main_nav_container">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12 text-right">
+                            <div class="logo_container">
+                                <a href="@Url.Action("Index", "Home")">
+                                    <img src="~/Content/assets/images/logo.png" alt="ColoShop" style="height:30px;">
+                                </a>
+                                <a href="#">krik<span>shop</span> </a>
+                            </div>
+                            <nav class="navbar">
+                                @Html.Action("MenuTop", "Menu")
+                                <ul class="navbar_user">
+                                    <li>
+                                        @if (Request.IsAuthenticated)
+                                        {
+                                            <a href="@Url.Action("DonHangCuaToi", "KhachHang")" title="Đơn hàng của tôi">
+                                                <i class="fa fa-archive" aria-hidden="true"></i>
+                                                <span class="d-none d-lg-inline" style="margin-left:5px;"></span>
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <a href="@Url.Action("TraCuu", "KhachHang")" title="Tra cứu đơn hàng">
+                                                <i class="fa fa-search" aria-hidden="true"></i>
+                                                <span class="d-none d-lg-inline" style="margin-left:5px;"></span>
+                                            </a>
+                                        }
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("Index", "Profile")" title="Thông tin tài khoản">
+                                            <i class="fa fa-user" aria-hidden="true"></i>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("MyFavorites", "Favorite")">
+                                            <i class="fa fa-heart"></i>
+                                        </a>
+                                    </li>
+                                    <li class="checkout">
+                                        <a href="@Url.Action("Index", "GioHangs")">
+                                            <i class="fa fa-shopping-cart"></i>
+                                            <span id="checkout_items" class="checkout_items">
+                                                @Html.Action("CartCount", "GioHangs")
+                                            </span>
+                                        </a>
+                                    </li>
+
+
+
+                                </ul>
+                                <div class="hamburger_container">
+                                    <i class="fa fa-bars" aria-hidden="true"></i>
+                                </div>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </header>
+
+        <div class="fs_menu_overlay"></div>
+        @RenderBody()
+
+        <!-- Newsletter -->
+
+        <div class="newsletter">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="newsletter_text d-flex flex-column justify-content-center align-items-lg-start align-items-md-center text-center">
+                            <h4>Bản tin</h4>
+                            <p>Đăng ký nhận bản tin của chúng tôi</p>
+                            <p>và được giảm giá 20% cho lần mua hàng đầu tiên</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <form action="post">
+                            <div class="newsletter_form d-flex flex-md-row flex-column flex-xs-column align-items-center justify-content-lg-end justify-content-center">
+                                <input id="newsletter_email" type="email" placeholder="Your email" required="required" data-error="Valid email is required.">
+                                <button id="newsletter_submit" type="submit" class="newsletter_submit_btn trans_300" value="Submit">subscribe</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+
+        <footer class="footer">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="footer_nav_container d-flex flex-sm-row flex-column align-items-center justify-content-lg-start justify-content-center text-center">
+                            <ul class="footer_nav">
+                                <li><a href="@Url.Action("Index", "TinTuc")">Blog</a></li>
+                                <li><a href="#">FAQs</a></li>
+                                <li><a href="@Url.Action("Contact", "Home")">Contact us</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="footer_social d-flex flex-row align-items-center justify-content-lg-end justify-content-center">
+                            <ul>
+                                <li><a href="https://www.facebook.com/Krik.vn"><i class="fa fa-facebook" aria-hidden="true"></i></a></li>
+                                <li><a href="#"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
+                                <li><a href="https://www.instagram.com/krik_vn?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="><i class="fa fa-instagram" aria-hidden="true"></i></a></li>
+                                <li><a href="#"><i class="fa fa-skype" aria-hidden="true"></i></a></li>
+                                <li><a href="#"><i class="fa fa-pinterest" aria-hidden="true"></i></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="footer_nav_container">
+                            <div class="cr">©2025 Bản quyền thuộc về <i class="fa fa-heart-o" aria-hidden="true"></i> Nhóm 2  <a href="#">Đồ án Chuyên ngành</a> &amp; distributed by <a href="#">Nguyễn Huy Công</a></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+
+
+
+    @*@Scripts.Render("~/bundles/jquery")*@
+    <script src="~/Content/assets/js/jquery-3.2.1.min.js"></script>
+    @*<script src="~/Scripts/bootstrap.bundle.min.js"></script>*@
+    <script src="~/Content/assets/styles/bootstrap4/popper.js"></script>
+    <script src="~/Content/assets/styles/bootstrap4/bootstrap.min.js"></script>
+    <script src="~/Content/assets/plugins/Isotope/isotope.pkgd.min.js"></script>
+    <script src="~/Content/assets/plugins/OwlCarousel2-2.2.1/owl.carousel.js"></script>
+    <script src="~/Content/assets/plugins/easing/easing.js"></script>
+    <script src="~/Content/assets/plugins/jquery-ui-1.12.1.custom/jquery-ui.js"></script>
+    <script src="~/Content/assets/js/custom.js"></script>
+    <link href="~/Content/Site.css" rel="stylesheet" />
+
+
+    <script>
+        $(document).off('show.bs.modal');
+        $(document).off('hidden.bs.modal');
+    </script>
+
+    <!--THÊM SẢN PHẨM YÊU THÍCH-->
+    <script>
+        // Lấy token an toàn (ưu tiên token toàn cục đầu tiên trong <body>)
+        function getAfToken() {
+            var $t = $('input[name="__RequestVerificationToken"]').first();
+            return $t.length ? $t.val() : null;
+        }
+
+        // Toast mini gọn nhẹ
+        function showFavMsg(msg) {
+            var id = 'favorite-message';
+            if (!document.getElementById(id)) {
+                $('body').append('<div id="' + id + '"></div>');
+            }
+            $('#' + id).text(msg).css({
+                position: 'fixed', top: '20px', right: '20px',
+                background: '#333', color: '#fff',
+                padding: '10px 14px', borderRadius: '8px',
+                zIndex: 9999, opacity: 0.95
+            }).stop(true, true).fadeIn(150).delay(1400).fadeOut(400);
+        }
+
+        // Handler toàn cục cho tất cả .favorite (kể cả item owl-carousel clone)
+        $(document).on('click', '.favorite', function (e) {
+            e.preventDefault();
+            var $el = $(this);
+            var id = $el.data('product');
+            if (!id) return;
+
+            var token = getAfToken();
+            if (!token) { alert('Thiếu mã xác thực. Hãy refresh trang.'); return; }
+
+            $.ajax({
+                url: '/Favorite/Toggle',
+                type: 'POST',
+                data: { __RequestVerificationToken: token, productId: id },
+                success: function (res) {
+                    if (!res || !res.success) {
+                        alert(res && res.message ? res.message : 'Lỗi xảy ra.');
+                        return;
+                    }
+                    if (res.liked) {
+                        $el.addClass('active');
+                        showFavMsg('✅ Đã thêm sản phẩm vào yêu thích!');
+                    } else {
+                        $el.removeClass('active');
+                        showFavMsg('❌ Đã bỏ thích sản phẩm yêu thích!');
+                    }
+                },
+                error: function () {
+                    alert('Có lỗi xảy ra, vui lòng thử lại.');
+                }
+            });
+        });
+    </script>
+
+
+    @RenderSection("scripts", required: false)
+
+
+    <script src="~/Scripts/jsShopping.js"></script>
+</body>
+
+
+</html>

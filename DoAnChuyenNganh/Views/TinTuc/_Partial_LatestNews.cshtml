@@ -1,0 +1,70 @@
+﻿@model IEnumerable<DoAnChuyenNganh.Models.EF.TinTuc>
+
+<div class="blogs py-5">
+    <div class="container">
+        <div class="row mb-4">
+            <div class="col text-center">
+                <h2 class="fw-bold position-relative d-inline-block pb-2">
+                    Tin tức mới nhất
+                </h2>
+                <div class="underline mx-auto mt-2" style="width:80px; height:3px; background-color:#ff4c4c;"></div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            @foreach (var item in Model)
+            {
+                var img = item.HinhAnhTinTucs.FirstOrDefault()?.Url ?? Url.Content("~/Content/assets/images/no-image.jpg");
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card border-0 shadow-sm h-100 rounded-3 overflow-hidden blog-card">
+                        <div class="overflow-hidden">
+                            <a href="@Url.Action("Detail", "TinTuc", new { slug = item.Slug })">
+                                <img src="@Url.Content(img)" class="card-img-top img-fluid transition-scale" alt="@item.TieuDe"
+                                     style="height:250px; object-fit:cover; width:100%;">
+                            </a>
+                        </div>
+                        <div class="card-body text-center d-flex flex-column justify-content-between">
+                            <h5 class="card-title fw-semibold mt-3">@item.TieuDe</h5>
+                            <a href="@Url.Action("Detail", "TinTuc", new { slug = item.Slug })"
+                               class="btn btn-outline-danger mt-3 px-4 py-2 fw-semibold transition-all"
+                               style="border-radius:30px;">Xem chi tiết</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    .blog-card {
+        transition: all 0.3s ease;
+    }
+
+        .blog-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        }
+
+    .transition-scale {
+        transition: transform 0.4s ease;
+    }
+
+    .blog-card:hover .transition-scale {
+        transform: scale(1.05);
+    }
+
+    .transition-all {
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline-danger:hover {
+        background-color: #ff4c4c;
+        color: #fff;
+        border-color: #ff4c4c;
+    }
+
+    .underline {
+        margin-top: 5px;
+    }
+</style>

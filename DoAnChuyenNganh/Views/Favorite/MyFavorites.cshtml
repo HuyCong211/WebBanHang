@@ -1,0 +1,118 @@
+﻿@model IEnumerable<DoAnChuyenNganh.Models.EF.SanPham>
+@{
+    ViewBag.Title = "Sản phẩm yêu thích của tôi";
+}
+
+<h2 class="mb-4">@ViewBag.Title</h2>
+
+<link rel="stylesheet" type="text/css" href="~/Content/assets/styles/categories_styles.css" />
+<link rel="stylesheet" type="text/css" href="~/Content/assets/styles/categories_responsive.css" />
+
+<div class="container product_section_container">
+    <div class="row">
+        <div class="col product_section clearfix">
+
+            <div class="breadcrumbs d-flex flex-row align-items-center mb-4">
+                <ul>
+                    <li><a href="@Url.Action("Index","Home")">Home</a></li>
+                    <li class="active">
+                        <a href="#"><i class="fa fa-angle-right" aria-hidden="true"></i> Sản phẩm yêu thích</a>
+                    </li>
+                </ul>
+            </div>
+
+            @if (!Model.Any())
+            {
+                <div class="alert alert-info">Bạn chưa có sản phẩm yêu thích nào.</div>
+            }
+            else
+            {
+                <table class="table table-bordered table-hover align-middle">
+                    <thead class="thead-light">
+                        <tr>
+                            <th style="width: 60px;">STT</th>
+                            <th style="width: 150px;">Hình ảnh</th>
+                            <th>Tên sản phẩm</th>
+                            <th style="width: 200px; text-align:center;">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Select((sp, idx) => new { sp, idx }))
+                        {
+                            var img = item.sp.AnhSanPhams.FirstOrDefault()?.Url ?? Url.Content("~/Content/assets/images/no-image.png");
+                            <tr data-id="@item.sp.SanPhamId">
+                                <td>@(item.idx + 1)</td>
+                                <td>
+                                    <img src="@img"
+                                         alt="@item.sp.TenSanPham"
+                                         style="width:100px; height:auto; border-radius:5px; object-fit:cover;" />
+                                </td>
+                                <td>@item.sp.TenSanPham</td>
+                                <td class="text-center">
+                                    <a href="@Url.Action("Detail", "Products", new { id = item.sp.SanPhamId })"
+                                       class="btn btn-sm btn-primary">
+                                        <i class="fa fa-eye"></i> Xem chi tiết
+                                    </a>
+                                    <button class="btn btn-sm btn-danger btn-unfavorite" data-id="@item.sp.SanPhamId">
+                                        <i class="fa fa-heart-broken"></i> Bỏ thích
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+$(document).on('click', '.btn-unfavorite', function (e) {
+    e.preventDefault();
+    var btn = $(this);
+    var id = btn.data('id');
+    var row = btn.closest('tr');
+
+    $.ajax({
+        url: '/Favorite/Toggle',
+        type: 'POST',
+        data: {
+            __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
+            productId: id
+        },
+        success: function (res) {
+            if (res && res.success) {
+                row.fadeOut(400, function () {
+                    $(this).remove();
+                    showFavMsg('💔 Đã bỏ sản phẩm khỏi danh sách yêu thích.');
+                    // Nếu bảng trống, thêm thông báo
+                    if ($('tbody tr').length === 0) {
+                        $('table').replaceWith('<div class="alert alert-info mt-3">Bạn chưa có sản phẩm yêu thích nào.</div>');
+                    }
+                });
+            } else {
+                alert(res && res.message ? res.message : 'Lỗi không xác định.');
+            }
+        },
+        error: function () {
+            alert('Có lỗi xảy ra, vui lòng thử lại.');
+        }
+    });
+});
+
+// Hiển thị thông báo mini
+function showFavMsg(msg) {
+    var id = 'favorite-message';
+    if (!document.getElementById(id)) {
+        $('body').append('<div id="' + id + '"></div>');
+    }
+    $('#'+id).text(msg).css({
+        position: 'fixed', top: '20px', right: '20px',
+        background: '#333', color: '#fff',
+        padding: '10px 15px', borderRadius: '8px',
+        zIndex: 9999, opacity: 0.95
+    }).stop(true,true).fadeIn(200).delay(1400).fadeOut(600);
+}
+    </script>
+}

@@ -1,0 +1,347 @@
+﻿@using DoAnChuyenNganh.Models.EF
+@model dynamic
+
+@{
+    ViewBag.Title = "Thanh toán";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="checkout-container container" style="margin-top:150px; margin-bottom:80px;">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold text-primary">
+            <i class="fas fa-credit-card me-2"></i> Xác nhận thanh toán
+        </h2>
+        <p class="text-muted">Vui lòng kiểm tra thông tin và xác nhận đơn hàng của bạn</p>
+    </div>
+
+    @using (Html.BeginForm("DatHang", "GioHangs", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="SelectedIds" value="@ViewBag.Selected" />
+        <input type="hidden" id="IsUseAccountInfo" name="IsUseAccountInfo" value="false" />
+
+        <div class="row g-4">
+
+            <!-- 🔹 Thông tin giao hàng -->
+            <div class="col-lg-5">
+                <div class="card border-0 shadow-sm rounded-4">
+                    <div class="card-header bg-gradient text-white" style="background: linear-gradient(90deg, #007bff, #00c6ff);">
+                        <h5 class="mb-0"><i class="fas fa-user me-2"></i>Thông tin giao hàng</h5>
+                    </div>
+                    <div class="card-body">
+
+
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <input type="hidden" id="KhachHangId" name="KhachHangId" />
+                            <input type="hidden" id="DiaChiId" name="DiaChiId" />
+
+
+                            <div class="form-group mb-3">
+                                <label>Họ tên</label>
+                                <input type="text" id="HoTen" name="HoTen" class="form-control rounded-pill" placeholder="Họ tên..." required />
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label>Email</label>
+                                <input type="email" id="Email" name="Email" class="form-control rounded-pill" placeholder="Email..." required />
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label>Số điện thoại</label>
+                                <input type="text" id="DienThoai" name="DienThoai" class="form-control rounded-pill" placeholder="Số điện thoại..." required />
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label>Tỉnh/Thành phố</label>
+                                <input type="text" id="Tinh" name="Tinh" class="form-control rounded-pill" required />
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label>Quận/Huyện</label>
+                                <input type="text" id="Huyen" name="Huyen" class="form-control rounded-pill" required />
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label>Phường/Xã</label>
+                                <input type="text" id="Xa" name="Xa" class="form-control rounded-pill" required />
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label>Địa chỉ chi tiết</label>
+                                <textarea id="DiaChi" name="DiaChi" class="form-control rounded-3" rows="2" placeholder="Số nhà, đường..." required></textarea>
+                            </div>
+
+                            <!-- Modal chọn địa chỉ -->
+                            <div class="modal fade" id="addressSelectModal" tabindex="-1">
+                                <div class="modal-dialog modal-lg">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Chọn địa chỉ giao hàng cũ</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <table class="table table-bordered align-middle">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Họ tên</th>
+                                                        <th>Email</th>
+                                                        <th>SĐT</th>
+                                                        <th>Tỉnh/Huyện/Xã</th>
+                                                        <th>Địa chỉ</th>
+                                                        <th></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach (var dc in (List<DoAnChuyenNganh.Models.EF.DiaChiGiaoHang>)ViewBag.DanhSachDiaChi)
+                                                    {
+                                                        <tr>
+                                                            <td>@dc.HoTen</td>
+                                                            <td>@dc.Email</td>
+                                                            <td>@dc.DienThoai</td>
+                                                            <td>@($"{dc.Xa}, {dc.Huyen}, {dc.Tinh}")</td>
+                                                            <td>@dc.DiaChiChiTiet</td>
+                                                            <td>
+                                                                <button type="button" class="btn btn-sm btn-primary select-address"
+                                                                        data-diachiid="@dc.DiaChiId"
+                                                                        data-khachhangid="@dc.KhachHangId"
+                                                                        data-hotten="@dc.HoTen"
+                                                                        data-email="@dc.Email"
+                                                                        data-sdt="@dc.DienThoai"
+                                                                        data-tinh="@dc.Tinh"
+                                                                        data-huyen="@dc.Huyen"
+                                                                        data-xa="@dc.Xa"
+                                                                        data-diachi="@dc.DiaChiChiTiet">
+                                                                    Chọn
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="form-group mb-3">
+                                <label class="fw-semibold">Họ tên <span class="text-danger">*</span></label>
+                                <input type="text" name="HoTen" class="form-control rounded-pill" placeholder="Nhập họ tên..." required />
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label class="fw-semibold">Email <span class="text-danger">*</span></label>
+                                <input type="email" name="Email" class="form-control rounded-pill" placeholder="example@gmail.com" required />
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label class="fw-semibold">Số điện thoại <span class="text-danger">*</span></label>
+                                <input type="text" name="DienThoai" class="form-control rounded-pill" placeholder="Nhập số điện thoại..." required />
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label class="fw-semibold">Địa chỉ giao hàng <span class="text-danger">*</span></label>
+                                <textarea name="DiaChi" class="form-control rounded-3" rows="2" placeholder="Nhập địa chỉ chi tiết..." required></textarea>
+                            </div>
+                        }
+
+
+                        <div class="form-group mb-3">
+                            <label class="fw-semibold">Ghi chú (tuỳ chọn)</label>
+                            <textarea name="GhiChu" class="form-control rounded-3" rows="2" placeholder="Ví dụ: Giao buổi sáng..."></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 🔹 Phương thức thanh toán -->
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm rounded-4">
+                    <div class="card-header bg-gradient text-white" style="background: linear-gradient(90deg, #6c757d, #adb5bd);">
+                        <h5 class="mb-0"><i class="fas fa-wallet me-2"></i>Phương thức thanh toán</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="radio" name="PhuongThucThanhToanId" value="1" checked id="cod" />
+                            <label class="form-check-label fw-semibold" for="cod">
+                                <i class="fas fa-truck"></i> Thanh toán khi nhận hàng (COD)
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="PhuongThucThanhToanId" value="2" id="vnpay" />
+                            <label class="form-check-label fw-semibold" for="vnpay">
+                                <i class="fas fa-credit-card"></i> Thanh toán qua VNPay
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="PhuongThucThanhToanId" value="3" id="chuyenkhoan" />
+                            <label class="form-check-label fw-semibold" for="chuyenkhoan">
+                                <i class="fas fa-credit-card"></i> Thanh toán qua tài khoản ngân hàng
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 🔹 Nút xác nhận -->
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-success btn-lg px-5 rounded-pill shadow-sm">
+                        <i class="fas fa-check-circle me-2"></i> Xác nhận đặt hàng
+                    </button>
+                </div>
+            </div>
+
+            <!-- 🔹 Tóm tắt đơn hàng -->
+            <div class="col-lg-3">
+                <div class="card border-0 shadow-sm rounded-4 h-100">
+                    <div class="card-header bg-gradient text-white" style="background: linear-gradient(90deg, #28a745, #80d980);">
+                        <h5 class="mb-0"><i class="fas fa-box-open me-2"></i> Tóm tắt đơn hàng</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th class="text-start">Sản phẩm</th>
+                                        <th class="text-end">Tổng</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        decimal tongTien = 0;
+                                        if (Model is GioHang)
+                                        {
+                                            foreach (var item in Model.GioHangChiTiets)
+                                            {
+                                                <tr>
+                                                    <td class="text-start">@item.BienTheSanPham.SanPham.TenSanPham <br /><small>x @item.SoLuong</small></td>
+                                                    <td class="text-end">@((item.ThanhTien ?? 0).ToString("N0")) đ</td>
+                                                </tr>
+                                                ;
+                                                tongTien += item.ThanhTien ?? 0;
+                                            }
+                                        }
+                                        else if (Model is List<DoAnChuyenNganh.Models.EF.CartItem>)
+                                        {
+                                            foreach (var item in Model)
+                                            {
+                                                <tr>
+                                                    <td class="text-start">@item.Name <br /><small>x @item.SoLuong</small></td>
+                                                    <td class="text-end">@((item.SoLuong * item.DonGia).ToString("N0")) đ</td>
+                                                </tr>
+                                                ;
+                                                tongTien += item.SoLuong * item.DonGia;
+                                            }
+                                        }
+                                    }
+                                </tbody>
+                                <tfoot class="border-top">
+                                    <tr>
+                                        <td class="fw-bold text-start">Tổng cộng:</td>
+                                        <td class="fw-bold text-success text-end">@tongTien.ToString("N0") đ</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            const $checkbox = $('#useOldAddress');
+            const $modal = $('#addressSelectModal');
+            let modalOpened = false; // tránh gọi nhiều lần
+
+            // Khi tick vào checkbox
+            $checkbox.on('change', function () {
+                if (this.checked) {
+                    if (!modalOpened) {
+                        modalOpened = true;
+                        $modal.modal({
+                            backdrop: 'static',
+                            keyboard: false
+                        });
+                        $modal.modal('show');
+                    }
+                } else {
+                    // Bỏ tick → clear form
+                    const fields = ['#KhachHangId', '#DiaChiId', '#HoTen', '#Email', '#DienThoai', '#Tinh', '#Huyen', '#Xa', '#DiaChi'];
+                    fields.forEach(sel => $(sel).val(''));
+                }
+            });
+
+            // Khi chọn địa chỉ
+            $(document).on('click', '.select-address', function () {
+                const btn = $(this);
+                $('#DiaChiId').val(btn.data('diachiid'));
+                $('#KhachHangId').val(btn.data('khachhangid'));
+                $('#HoTen').val(btn.data('hotten'));
+                $('#Email').val(btn.data('email'));
+                $('#DienThoai').val(btn.data('sdt'));
+                $('#Tinh').val(btn.data('tinh'));
+                $('#Huyen').val(btn.data('huyen'));
+                $('#Xa').val(btn.data('xa'));
+                $('#DiaChi').val(btn.data('diachi'));
+
+                // Đóng modal sau khi chọn
+                $modal.modal('hide');
+            });
+
+            // Khi modal đóng, reset trạng thái mở
+            $modal.on('hidden.bs.modal', function () {
+                modalOpened = false;
+                // Nếu chưa chọn gì mà đóng modal → bỏ tick luôn
+                if (!$('#DiaChiId').val()) {
+                    $checkbox.prop('checked', false);
+                }
+                $('body').removeClass('modal-open');
+                $('.modal-backdrop').remove();
+            });
+        });
+    </script>
+}
+
+
+
+
+
+
+
+<style>
+    .card {
+        transition: all 0.3s ease;
+    }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+        }
+
+    .checkout-container label {
+        font-weight: 600;
+    }
+
+    .form-control:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+
+    .btn-success {
+        background: linear-gradient(90deg, #28a745, #5edb6a);
+        border: none;
+    }
+
+        .btn-success:hover {
+            background: linear-gradient(90deg, #20c997, #28a745);
+            transform: scale(1.02);
+        }
+
+    .text-primary {
+        color: #007bff !important;
+    }
+</style>

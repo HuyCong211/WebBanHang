@@ -1,0 +1,84 @@
+﻿@model IEnumerable<DoAnChuyenNganh.Models.EF.SanPham>
+
+@if (Model != null && Model.Any())
+{
+    foreach (var item in Model)
+    {
+        var strImage = "";
+        var altText = item.TenSanPham; // mặc định alt = tên sản phẩm
+
+        // Kiểm tra null cho AnhSanPhams
+        var img = item.AnhSanPhams?.FirstOrDefault(x => x.MacDinh == true);
+
+        if (img == null)
+        {
+            img = item.AnhSanPhams?.FirstOrDefault();
+        }
+
+        if (img != null)
+        {
+            strImage = img.Url;
+            if (!string.IsNullOrEmpty(img.MoTa))
+            {
+                altText = img.MoTa;
+            }
+        }
+
+        // 🔹 Dùng đúng phần trăm giảm giá đã tính ở Controller
+        var discountPercent = item.ViewBag_DiscountPercent > 0
+            ? (int)Math.Round(item.ViewBag_DiscountPercent)
+            : (int?)null;
+
+
+
+        <div class="product-item @(item.DanhMuc?.Slug ?? "") @(item.DanhMuc?.DanhMuc2?.Slug ?? "")">
+            <div class="product discount product_filter">
+                <div class="product_image">
+                    <a href="@Url.RouteUrl("DetailSanPham", new { slug = item.Slug, id = item.SanPhamId })">
+                        <img src="@strImage" alt="@altText" />
+                    </a>
+                    @*<img src="@strImage" alt="@altText" />*@
+                </div>
+                @*<div class="favorite favorite_left"></div>*@
+
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <div class="favorite favorite_left @(item.IsFavorite ? "active" : "")"
+                         data-product="@item.SanPhamId"></div>
+                }
+
+
+
+
+                @if (discountPercent.HasValue)
+                {
+                    <div class="product_bubble product_bubble_right product_bubble_red d-flex flex-column align-items-center">
+                        <span>-@discountPercent%</span>
+                    </div>
+                }
+                <div class="product_info">
+                    <h6 class="product_name">
+                        <a href="@Url.RouteUrl("DetailSanPham", new { slug = item.Slug, id = item.SanPhamId })">
+                            @item.TenSanPham
+                        </a>
+                        @*<a href="@Url.Action("Detail", "Products", new { id = item.SanPhamId })">@item.TenSanPham</a>*@
+                    </h6>
+                    <div class="product_price">
+                        @String.Format("{0:N0} ₫", item.ViewBag_FinalPrice != 0 ? item.ViewBag_FinalPrice : item.GiaBan)
+                        @if (item.ViewBag_DiscountPercent > 0)
+                        {
+                            <span>@String.Format("{0:N0} ₫", item.GiaGoc ?? item.GiaBan)</span>
+                        }
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="red_button add_to_cart_button">
+                <a href="/Products/Detail/@item.SanPhamId">Add to cart</a>
+                @*<a href="#" class="btnAddToCart" data-id="@item.SanPhamId">add to cart</a>*@
+            </div>
+        </div>
+    }
+}
+

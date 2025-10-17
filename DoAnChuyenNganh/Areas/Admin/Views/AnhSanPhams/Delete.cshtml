@@ -1,0 +1,166 @@
+﻿@model DoAnChuyenNganh.Models.EF.AnhSanPham
+
+@{
+    ViewBag.Title = "Xóa ảnh sản phẩm";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+
+@section naviheader
+{
+    <!-- Left navbar links -->
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/admin/home" class="nav-link">Trang chủ</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/admin/anhsanphams" class="nav-link">Ảnh sản phẩm</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="#" class="nav-link">Xóa</a>
+        </li>
+    </ul>
+}
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Xóa ảnh sản phẩm</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="/admin/anhsanphams/">Ảnh sản phẩm</a></li>
+                    <li class="breadcrumb-item active">Xóa</li>
+                </ol>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<!-- Main content -->
+<section class="content">
+
+    <!-- Default box -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Thông tin xóa ảnh sản phẩm</h3>
+
+        </div>
+        <div class="card-body">
+            <div class="bs-stepper-content">
+                <dl class="dl-horizontal">
+                    <dt>
+                        @Html.DisplayNameFor(model => model.SanPham.MaSanPham)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.SanPham.MaSanPham)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.Url)
+                    </dt>
+
+                    <dd>
+                        <img src="@Model.Url" alt="Ảnh sản phẩm" style="max-height:200px; border:1px solid #ddd; padding:4px;" />
+                        <br />
+                        @Html.DisplayFor(model => model.Url)
+                    </dd>
+                    <dt>Biến thể áp dụng</dt>
+                    <dd>
+                        @if (Model.AnhSanPham_BienThes != null && Model.AnhSanPham_BienThes.Any())
+                        {
+                            <ul>
+                                @foreach (var bt in Model.AnhSanPham_BienThes)
+                                {
+                                    <li>@bt.BienTheSanPham.SKU</li>
+                                }
+                            </ul>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Không có</span>
+                        }
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.ThuTu)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.ThuTu)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.MacDinh)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.MacDinh)
+                    </dd>
+
+                    <dt>
+                        @Html.DisplayNameFor(model => model.MoTa)
+                    </dt>
+
+                    <dd>
+                        @Html.DisplayFor(model => model.MoTa)
+                    </dd>
+
+                </dl>
+                @using (Html.BeginForm())
+                {
+                    @Html.AntiForgeryToken()
+
+                    <div class="form-actions no-color">
+                        <button type="button" class="btn btn-danger btnXoa" data-id="@Model.AnhSanPhamId">Xóa</button>
+                        <a href="@Url.Action("Index")" class="btn btn-dark">Quay lại</a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+
+<div id="thongBaoXoa" class="mt-2"></div>
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            $(".btnXoa").click(function () {
+                var id = $(this).data("id");
+
+                if (!confirm("Bạn có chắc chắn muốn xóa ảnh sản phẩm này?")) {
+                    return; // nếu bấm Cancel thì thoát luôn
+                }
+
+                $.ajax({
+                    url: '@Url.Action("Delete", "AnhSanPhams")',
+                    type: 'POST',
+                    data: { id: id },
+                    success: function (res) {
+                        if (res.success) {
+                            $("#thongBaoXoa").html("<div class='alert alert-success'>" + res.message + "</div>");
+                            setTimeout(function () {
+                                window.location.href = '@Url.Action("Index", "AnhSanPhams")';
+                            }, 1000);
+                        } else {
+                            $("#thongBaoXoa").html("<div class='alert alert-danger'>" + res.message + "</div>");
+                        }
+                    },
+                    error: function () {
+                        $("#thongBaoXoa").html("<div class='alert alert-danger'>Có lỗi xảy ra khi xóa ảnh sản phẩm.</div>");
+                    }
+                });
+            });
+        });
+    </script>
+}
+

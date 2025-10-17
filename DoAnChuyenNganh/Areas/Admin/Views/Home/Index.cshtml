@@ -1,0 +1,135 @@
+﻿@{
+    ViewBag.Title = "Trang quản trị";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2 align-items-center">
+            <div class="col-sm-8">
+                <h1 class="text-primary font-weight-bold mb-1">👋 Chào mừng bạn trở lại, @ViewBag.FullName!</h1>
+                <p class="text-muted mb-0">Đây là bảng điều khiển tổng quan dành cho quản trị viên.</p>
+            </div>
+            <div class="col-sm-4">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="/Admin/Home">Trang chủ</a></li>
+                    <li class="breadcrumb-item active">Bảng điều khiển</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+
+        <!-- Hàng card thống kê -->
+        <div class="row">
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-info">
+                    <div class="inner">
+                        <h3>@ViewBag.ProductCount</h3>
+                        <p>Sản phẩm</p>
+                    </div>
+                    <div class="icon"><i class="fas fa-box"></i></div>
+                    <a href="/admin/sanphams" class="small-box-footer">
+                        Xem chi tiết <i class="fas fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-success">
+                    <div class="inner">
+                        <h3>@ViewBag.OrderCount</h3>
+                        <p>Đơn hàng</p>
+                    </div>
+                    <div class="icon"><i class="fas fa-shopping-cart"></i></div>
+                    <a href="/admin/donhangs" class="small-box-footer">
+                        Xem thêm <i class="fas fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-warning">
+                    <div class="inner">
+                        <h3>@ViewBag.UserCount</h3>
+                        <p>Người dùng</p>
+                    </div>
+                    <div class="icon"><i class="fas fa-users"></i></div>
+                    <a href="/admin/users" class="small-box-footer">
+                        Quản lý tài khoản <i class="fas fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-danger">
+                    <div class="inner">
+                        <h3>@ViewBag.StockCount</h3>
+                        <p>Báo cáo tồn kho</p>
+                    </div>
+                    <div class="icon"><i class="fas fa-warehouse"></i></div>
+                    <a href="/admin/TonKhoes" class="small-box-footer">
+                        Kiểm tra ngay <i class="fas fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Hàng thông tin chào -->
+        <div class="card shadow-lg mt-4">
+            <div class="card-header bg-gradient-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-info-circle"></i> Thông tin hệ thống</h5>
+            </div>
+            <div class="card-body">
+                <p class="lead">
+                    Chào mừng bạn đến với <strong>Hệ thống quản lý bán hàng</strong>.
+                    Tại đây bạn có thể quản lý sản phẩm, tài khoản, bài viết, quảng cáo, cấu hình hệ thống và hơn thế nữa.
+                </p>
+                <p class="mb-0">
+                    <i class="fas fa-lightbulb text-warning"></i> Mẹo: Bạn có thể truy cập nhanh các chức năng từ thanh bên trái.
+                </p>
+            </div>
+        </div>
+
+    </div><!-- /.container-fluid -->
+</section>
+
+@section Scripts {
+    <script>
+        // Hiệu ứng fade-in nhẹ khi load dashboard
+        document.addEventListener("DOMContentLoaded", () => {
+            document.querySelectorAll('.small-box').forEach(box => {
+                box.classList.add('animate__animated', 'animate__fadeInUp');
+            });
+        });
+    </script>
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+<style>
+    .small-box {
+        border-radius: 15px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .small-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+        }
+
+    .card {
+        border-radius: 16px;
+    }
+
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #1d2671, #c33764);
+    }
+</style>
+

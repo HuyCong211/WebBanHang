@@ -1,0 +1,146 @@
+﻿@model DoAnChuyenNganh.Models.EF.DonHang
+@{
+    ViewBag.Title = "Chi tiết đơn hàng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="container" style="margin-top:150px; margin-bottom:100px;">
+    <h3 class="fw-bold mb-3">
+        <i class="fas fa-receipt"></i> Đơn hàng #@Model.MaDonHang
+    </h3>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header">Thông tin đơn</div>
+                <div class="card-body">
+                    <p><strong>Ngày đặt:</strong> @(Model.NgayTao?.ToString("dd/MM/yyyy HH:mm"))</p>
+                    <p><strong>Tổng tiền:</strong> @Model.TongTien.ToString("N0") đ</p>
+                    <p><strong>Phương thức:</strong> @(Model.PhuongThucThanhToanId==1?"COD":Model.PhuongThucThanhToanId==2?"VNPay":"Chuyển khoản")</p>
+                    <p>
+                        <strong>Trạng thái:</strong>
+                        @switch (Model.TrangThai)
+                        {
+                            case 0:<span class="badge bg-warning text-dark">Chờ xác nhận</span>; break;
+                            case 1: <span class="badge bg-info text-white">Đã xác nhận</span>; break;
+                            case 2: <span class="badge bg-primary">Đang giao</span>; break;
+                            case 3: <span class="badge bg-success">Hoàn tất</span>; break;
+                            case 4: <span class="badge bg-danger">Đã huỷ</span>; break;
+                            default: <span class="badge bg-secondary">Không xác định</span>; break;
+                        }
+                    </p>
+
+                    @if (Model.TrangThai == 0 || Model.TrangThai == 1)
+                    {
+                        using (Html.BeginForm("HuyDonHang", "KhachHang", FormMethod.Post, new { onsubmit = "return confirmHuy();" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.Hidden("id", Model.DonHangId)
+                            <div class="mb-2">
+                                <label class="form-label">Lý do huỷ (tuỳ chọn)</label>
+                                <textarea name="lyDo" class="form-control" rows="2"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-outline-danger">
+                                <i class="fas fa-times"></i> Huỷ đơn hàng
+                            </button>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header">Địa chỉ giao hàng</div>
+                <div class="card-body">
+                    @if (Model.DiaChiGiaoHang != null)
+                    {
+                        <p>@Model.DiaChiGiaoHang.HoTen</p>
+                        <p>@Model.DiaChiGiaoHang.DienThoai</p>
+                        <p>@Model.DiaChiGiaoHang.DiaChiChiTiet</p>
+                    }
+                    else
+                    {
+                        <p class="text-muted">—</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr class="my-4" />
+
+    <h5><i class="fas fa-box-open me-2"></i> Sản phẩm trong đơn</h5>
+    <div class="table-responsive">
+        <table class="table table-bordered align-middle text-center">
+            <thead class="table-light">
+                <tr>
+                    <th>#</th>
+                    <th>Ảnh</th>
+                    <th>Tên sản phẩm</th>
+                    <th>Thuộc tính</th>
+                    <th>SL</th>
+                    <th>Đơn giá</th>
+                    <th>Thành tiền</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int stt = 1;
+                    foreach (var item in Model.DonHangChiTiets)
+                    {
+                        var attrs = item.BienTheSanPham?.GiaTriThuocTinhs?
+                            .Select(gt => gt.ThuocTinh.TenThuocTinh + ": " + gt.TenGiaTri).ToList();
+                                <tr>
+                                    <td>@stt</td>
+                                    <td>
+                                        @{
+                                            var anh = item.BienTheSanPham?.AnhSanPham_BienThes?
+                                                .Select(ab => ab.AnhSanPham.Url)
+                                                .FirstOrDefault();
+                                        }
+
+                                        @if (!string.IsNullOrEmpty(anh))
+                                        {
+                                            <img src="@Url.Content(anh)" alt="Ảnh sản phẩm"
+                                                 style="width:60px;height:60px;object-fit:cover;border-radius:6px;" />
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">—</span>
+                                        }
+
+                                    </td>
+                                    <td>@(item.BienTheSanPham?.SanPham?.TenSanPham ?? "—")</td>
+                                    <td>@(attrs!=null && attrs.Any() ? string.Join(", ", attrs) : "—")</td>
+                                    <td>@item.SoLuong</td>
+                                    <td>@item.DonGia.ToString("N0") đ</td>
+                                    <td>@((item.ThanhTien ?? 0).ToString("N0")) đ</td>
+                                </tr>
+                        stt++;
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-3">
+        <a class="btn btn-secondary" href="@Url.Action("DonHangCuaToi", "KhachHang")">
+            ← Quay lại danh sách
+        </a>
+    </div>
+</div>
+
+<script>
+    function confirmHuy() {
+        return confirm('Bạn có chắc chắn muốn huỷ đơn hàng này không?');
+    }
+</script>

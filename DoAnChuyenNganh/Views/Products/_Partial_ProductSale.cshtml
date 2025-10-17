@@ -1,0 +1,132 @@
+﻿@model IEnumerable<DoAnChuyenNganh.Models.EF.SanPham>
+
+@if (Model != null && Model.Any())
+{
+    <div class="best_sellers">
+        <div class="container">
+            <div class="row">
+                <div class="col text-center">
+                    <div class="section_title new_arrivals_title">
+                        <h2>Hot Deals</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <div class="product_slider_container">
+                        <div class="owl-carousel owl-theme product_slider">
+                            @foreach (var item in Model)
+                            {
+                                string strImage = "";
+                                string altText = item.TenSanPham ?? "";
+
+                                var img = item.AnhSanPhams?.FirstOrDefault(x => x.MacDinh == true)
+                                          ?? item.AnhSanPhams?.FirstOrDefault();
+
+                                if (img != null)
+                                {
+                                    strImage = img.Url ?? "";
+                                    if (!string.IsNullOrEmpty(img.MoTa))
+                                    {
+                                        altText = img.MoTa;
+                                    }
+                                }
+
+                                var now = DateTime.Now;
+                                var km = item.KhuyenMais?
+                                    .FirstOrDefault(k => k.TrangThai == true
+                                                      && k.NgayBatDau <= now
+                                                      && k.NgayKetThuc >= now);
+
+                                // Giá sau khuyến mãi
+                                decimal giaSau = item.GiaBan;
+                                string discountText = "";
+
+                                if (km != null && km.GiaTri.HasValue)
+                                {
+                                    var loaiLower = (km.Loai ?? "").ToLower();
+                                    var giaTri = km.GiaTri.Value;
+
+                                    if (loaiLower.Contains("phan") || loaiLower.Contains("phần"))
+                                    {
+                                        // phần trăm
+                                        giaSau = item.GiaBan - (item.GiaBan * giaTri / 100m);
+                                        discountText = "-" + giaTri.ToString("0") + "%";
+                                    }
+                                    else
+                                    {
+                                        // tiền mặt
+                                        giaSau = item.GiaBan - giaTri;
+                                        discountText = "-" + String.Format("{0:N0} ₫", giaTri);
+                                    }
+                                }
+
+                                // đảm bảo giá không âm — dùng Math.Max để tránh single-line if gây lỗi Razor
+                                giaSau = Math.Max(0m, giaSau);
+
+                                <div class="owl-item product_slider_item">
+                                    <div class="product-item">
+                                        <div class="product @(km != null ? "discount" : "")">
+                                            <div class="product_image">
+                                                <a href="@Url.Action("Detail", "Products", new { id = item.SanPhamId })">
+                                                    <img src="@Url.Content(strImage)" alt="@altText" />
+                                                </a>
+                                                @*<img src="@Url.Content(strImage)" alt="@altText" />*@
+                                            </div>
+
+                                            @if (User.Identity.IsAuthenticated)
+                                            {
+                                                <div class="favorite favorite_left @(item.IsFavorite ? "active" : "")"
+                                                     data-product="@item.SanPhamId"></div>
+                                            }
+
+
+
+                                            @if (!String.IsNullOrEmpty(discountText))
+                                            {
+                                                <div class="product_bubble product_bubble_right product_bubble_red d-flex flex-column align-items-center">
+                                                    <span>@discountText</span>
+                                                </div>
+                                            }
+
+                                            <div class="product_info">
+                                                <h6 class="product_name">
+                                                    <a href="@Url.Action("Detail", "Products", new { id = item.SanPhamId })">
+                                                        @item.TenSanPham
+                                                    </a>
+                                                </h6>
+                                                <div class="product_price">
+                                                    @String.Format("{0:N0} ₫", giaSau)
+                                                    @if (item.GiaBan > giaSau)
+                                                    {
+                                                        <span>@String.Format("{0:N0} ₫", item.GiaBan)</span>
+                                                    }
+                                                </div>
+                                            </div>
+
+
+                                        </div>
+
+                                        <div class="red_button add_to_cart_button">
+                                            <a href="/Products/Detail/@item.SanPhamId">Add to cart</a>
+                                            @*<a href="#" class="btnAddToCart" data-id="@item.SanPhamId">add to cart</a>*@
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="product_slider_nav_left product_slider_nav d-flex align-items-center justify-content-center flex-column">
+                            <i class="fa fa-chevron-left" aria-hidden="true"></i>
+                        </div>
+                        <div class="product_slider_nav_right product_slider_nav d-flex align-items-center justify-content-center flex-column">
+                            <i class="fa fa-chevron-right" aria-hidden="true"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+

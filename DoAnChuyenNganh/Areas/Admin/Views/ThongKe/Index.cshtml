@@ -1,0 +1,262 @@
+﻿@model IEnumerable<DoAnChuyenNganh.Models.EF.ThongKeDoanhThu>
+@{
+    ViewBag.Title = "📊 Thống kê hệ thống";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+@section naviheader
+{
+    <!-- Left navbar links -->
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/admin/home" class="nav-link">Trang chủ</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/admin/thongke" class="nav-link">Thống kê</a>
+        </li>
+    </ul>
+}
+
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h2 class="mb-4">📊 Thống kê hệ thống</h2>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="/admin/home/">Trang chủ</a></li>
+                    <li class="breadcrumb-item active">Thống kê</li>
+                </ol>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <div class="container mt-4">
+        <!-- Tổng quan -->
+        <div class="row text-center mb-4">
+            <div class="col-md-3">
+                <div class="card shadow-sm p-3">
+                    <h6>Đơn hàng</h6>
+                    <h3>@ViewBag.TotalOrders</h3>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card shadow-sm p-3 text-success">
+                    <h6>Hoàn thành</h6>
+                    <h3>@ViewBag.TotalCompleted</h3>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card shadow-sm p-3 text-warning">
+                    <h6>Chưa hoàn thành</h6>
+                    <h3>@ViewBag.TotalPending</h3>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card shadow-sm p-3 text-danger">
+                    <h6>Bị hủy</h6>
+                    <h3>@ViewBag.TotalCanceled</h3>
+                </div>
+            </div>
+        </div>
+
+        <button id="btnCapNhat" class="btn btn-success mb-3">🔄 Cập nhật thống kê</button>
+
+        <!-- Bộ lọc -->
+        <div class="mb-3">
+            <div class="d-flex flex-wrap align-items-center mb-2">
+                <label>Chế độ:</label>
+                <select id="mode" class="form-control d-inline-block" style="width:120px;" onchange="toggleInputs()">
+                    <option value="day">Ngày</option>
+                    <option value="month">Tháng</option>
+                    <option value="year">Năm</option>
+                </select>
+
+                <!-- Bộ lọc ngày -->
+                <span id="filter-day">
+                    <label class="ml-2">Từ:</label>
+                    <input type="date" id="fromDate" class="form-control d-inline-block" style="width:150px;" />
+                    <label class="ml-2">Đến:</label>
+                    <input type="date" id="toDate" class="form-control d-inline-block" style="width:150px;" />
+                </span>
+
+                <!-- Bộ lọc tháng -->
+                <span id="filter-month" style="display:none;">
+                    <label class="ml-2">Tháng:</label>
+                    <select id="monthSelect" class="form-control d-inline-block" style="width:100px;">
+                        @for (int i = 1; i <= 12; i++)
+                        {
+                            <option value="@i">Tháng @i</option>
+                        }
+                    </select>
+                    <label class="ml-2">Năm:</label>
+                    <input type="number" id="yearForMonth" class="form-control d-inline-block" style="width:100px;" value="@DateTime.Now.Year" />
+                </span>
+
+                <!-- Bộ lọc năm -->
+                <span id="filter-year" style="display:none;">
+                    <label class="ml-2">Năm:</label>
+                    <input type="number" id="yearSelect" class="form-control d-inline-block" style="width:100px;" value="@DateTime.Now.Year" />
+                </span>
+            </div>
+
+            <div class="btn-group-custom d-flex flex-wrap mt-2">
+                <button class="btn btn-primary" onclick="loadDoanhThu()">📈 Xem doanh thu</button>
+                <button class="btn btn-outline-info" onclick="loadSanPham('view')">👁️ Lượt xem</button>
+                <button class="btn btn-outline-success" onclick="loadSanPham('buy')">🛒 Mua hàng</button>
+                <button class="btn btn-outline-danger" onclick="loadSanPham('cancel')">❌ Hủy đơn</button>
+                <button class="btn btn-outline-secondary" onclick="loadLyDo()">⚠️ Lý do hủy</button>
+            </div>
+        </div>
+
+
+
+        <!-- Biểu đồ -->
+        <div class="card shadow-sm p-3">
+            <canvas id="chartThongKe" height="120"></canvas>
+            <div id="tongDoanhThu" class="text-right mt-2 text-primary font-weight-bold"></div>
+        </div>
+    </div>
+
+
+</section>
+
+
+<script>
+    let chart;
+    const ctx = document.getElementById("chartThongKe").getContext("2d");
+
+    function renderChart(labels, values, title, color) {
+        if (chart) chart.destroy();
+        chart = new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: title,
+                    data: values,
+                    backgroundColor: color,
+                }],
+            },
+            options: {
+                responsive: true,
+                scales: { y: { beginAtZero: true } },
+                plugins: {
+                    legend: { display: false },
+                    title: { display: true, text: title }
+                }
+            }
+        });
+    }
+
+    function toggleInputs() {
+        const mode = document.getElementById("mode").value;
+        document.getElementById("filter-day").style.display = mode === "day" ? "inline-block" : "none";
+        document.getElementById("filter-month").style.display = mode === "month" ? "inline-block" : "none";
+        document.getElementById("filter-year").style.display = mode === "year" ? "inline-block" : "none";
+    }
+
+    function loadDoanhThu() {
+        const mode = document.getElementById("mode").value;
+        let params = `mode=${mode}`;
+
+        if (mode === "day") {
+            const from = document.getElementById("fromDate").value;
+            const to = document.getElementById("toDate").value;
+            if (from) params += `&from=${from}`;
+            if (to) params += `&to=${to}`;
+        } else if (mode === "month") {
+            const month = document.getElementById("monthSelect").value;
+            const year = document.getElementById("yearForMonth").value;
+            params += `&month=${month}&year=${year}`;
+        } else if (mode === "year") {
+            const year = document.getElementById("yearSelect").value;
+            params += `&year=${year}`;
+        }
+
+        fetch(`@Url.Action("GetDoanhThu")?${params}`)
+            .then(res => res.json())
+            .then(res => {
+                const data = res.data || [];
+                if (!data.length) {
+                    renderChart([], [], "Không có dữ liệu", "rgba(200,200,200,0.5)");
+                    document.getElementById("tongDoanhThu").innerHTML = "";
+                    return;
+                }
+
+                renderChart(
+                    data.map(x => x.Label),
+                    data.map(x => x.DoanhThu),
+                    `Doanh thu theo ${mode === "day" ? "ngày" : mode === "month" ? "ngày trong tháng" : "tháng trong năm"}`,
+                    "rgba(0,123,255,0.6)"
+                );
+
+                let tong = res.tongDoanhThu.toLocaleString();
+                let text = "";
+
+                if (mode === "day")
+                    text = `💰 Tổng doanh thu từ ${res.from} đến ${res.to} là: ${tong} đ`;
+                else if (mode === "month")
+                    text = `💰 Tổng doanh thu tháng ${res.month}/${res.year} là: ${tong} đ`;
+                else
+                    text = `💰 Tổng doanh thu năm ${res.year} là: ${tong} đ`;
+
+                document.getElementById("tongDoanhThu").innerHTML = text;
+            });
+    }
+
+
+
+
+    function loadSanPham(type) {
+        fetch(`@Url.Action("GetThongKeSanPham")?type=${type}`)
+            .then(res => res.json())
+            .then(data => {
+                if (!data.length) { alert("Không có dữ liệu!"); return; }
+                let title = type === "view" ? "Top lượt xem" :
+                            type === "buy" ? "Sản phẩm bán chạy" :
+                            "Sản phẩm bị hủy nhiều";
+                const color = type === "view" ? "rgba(255,193,7,0.6)" :
+                              type === "buy" ? "rgba(40,167,69,0.6)" :
+                              "rgba(220,53,69,0.6)";
+                renderChart(data.map(x => x.TenSanPham), data.map(x => x.GiaTri), title, color);
+            });
+    }
+
+    function loadLyDo() {
+        fetch("@Url.Action("GetLyDoHuy")")
+            .then(res => res.json())
+            .then(data => {
+                if (!data.length) { alert("Không có dữ liệu!"); return; }
+                renderChart(data.map(x => x.LyDo), data.map(x => x.SoLan), "Lý do hủy đơn phổ biến", "rgba(108,117,125,0.6)");
+            });
+    }
+
+
+    document.getElementById("btnCapNhat").addEventListener("click", function () {
+    fetch('@Url.Action("CapNhatThongKe", "ThongKe")', { method: 'POST' })
+        .then(res => res.json())
+        .then(data => alert(data.message))
+        .catch(() => alert("❌ Lỗi khi cập nhật thống kê!"));
+    });
+</script>
+
+
+<style>
+    .btn-group-custom button {
+        margin-right: 95px;
+        margin-bottom: 8px;
+    }
+</style>

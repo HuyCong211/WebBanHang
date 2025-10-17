@@ -1,0 +1,30 @@
+﻿@model IEnumerable<DoAnChuyenNganh.Models.EF.DanhMuc>
+@{
+    string currentSlug = ViewBag.CurrentSlug as string;
+}
+@if (Model != null && Model.Any())
+{
+    <ul class="sidebar_categories">
+        @foreach (var item in Model)
+        {
+            if (ViewBag.DanhMucId == item.DanhMucId)
+            {
+                <li class="active"><a href="@item.Slug"><span><i class="fa fa-angle-double-right" aria-hidden="true"></i></span>@item.TenDanhMuc</a></li>
+            }
+            else
+            {
+                var isActive = item.Slug == currentSlug ? "active" : "";
+                <li><a href="/san-pham/@item.Slug">@item.TenDanhMuc</a></li>
+            }
+
+        }
+    </ul>
+
+}
+<style>
+    .sidebar_categories li.active a {
+        font-weight: bold;
+        color: red;
+    }
+</style>
+

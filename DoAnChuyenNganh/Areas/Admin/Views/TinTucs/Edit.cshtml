@@ -1,0 +1,293 @@
+﻿@model DoAnChuyenNganh.Models.EF.TinTuc
+
+@{
+    ViewBag.Title = "Cập nhật tin tức";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+
+
+@section naviheader
+{
+    <!-- Left navbar links -->
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/admin/home" class="nav-link">Trang chủ</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/admin/tintucs" class="nav-link">Tin tức</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="#" class="nav-link">Cập nhật</a>
+        </li>
+    </ul>
+}
+
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Cập nhật tin tức</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="/admin/tintucs/">Tin tức</a></li>
+                    <li class="breadcrumb-item active">Cập nhật</li>
+                </ol>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<!-- Main content -->
+<section class="content">
+
+    <!-- Default box -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Thông tin cập nhật tin tức</h3>
+        </div>
+        <div class="card-body">
+            <div class="bs-stepper-content">
+
+
+                @using (Html.BeginForm("Edit", "TinTucs", FormMethod.Post, new { id = "formSua" }))
+                {
+                    @Html.AntiForgeryToken()
+
+                    <div class="form-horizontal">
+                        <h4>TinTuc</h4>
+                        <hr />
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                        @Html.HiddenFor(model => model.TinTucId)
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.TieuDe, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.EditorFor(model => model.TieuDe, new { htmlAttributes = new { @class = "form-control" } })
+                                @Html.ValidationMessageFor(model => model.TieuDe, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.TomTat, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.TextAreaFor(model => model.TomTat, new { @class = "form-control", @id = "txtTomTat" })
+                                @Html.ValidationMessageFor(model => model.TomTat, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.NoiDung, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.TextAreaFor(model => model.NoiDung, new { @class = "form-control", @id = "txtNoiDung" })
+                                @Html.ValidationMessageFor(model => model.NoiDung, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-2">Hình ảnh tin tức</label>
+                            <div class="col-md-10">
+                                <div id="dsAnhTT" class="row">
+                                    @if (Model.HinhAnhTinTucs != null && Model.HinhAnhTinTucs.Any())
+                                    {
+                                        foreach (var img in Model.HinhAnhTinTucs)
+                                        {
+                                            <div class="col-md-3 text-center mb-3" id="img-@img.HinhAnhId">
+                                                <img src="@img.Url" class="img-thumbnail" style="max-height:120px;" />
+                                                <button type="button" class="btn btn-danger btn-sm mt-1 btnXoaAnh" data-id="@img.HinhAnhId">Xóa</button>
+                                            </div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <p>Chưa có ảnh nào</p>
+                                    }
+                                </div>
+
+                                <hr />
+
+                                <!-- Upload từ máy -->
+                                <div class="input-group mb-2">
+                                    <div class="custom-file">
+                                        <input type="file" id="anhMoi" name="UploadImage" class="custom-file-input" accept="image/*">
+                                        <label class="custom-file-label" for="anhMoi">Chọn ảnh từ máy</label>
+                                    </div>
+                                </div>
+
+                                <!-- CKFinder -->
+                                <div class="input-group mb-2">
+                                    <input type="text" id="txtImageCK" class="form-control" placeholder="Link hoặc chọn ảnh từ CKFinder" />
+                                    <div class="input-group-append">
+                                        <button type="button" class="btn btn-success" onclick="BrowseServer('txtImageCK')">Chọn ảnh (CKFinder)</button>
+                                    </div>
+                                </div>
+
+                                <!-- Preview -->
+                                <div class="mt-2">
+                                    <img id="previewImage" src="" style="max-height:150px; display:none; border:1px solid #ddd; padding:4px;" />
+                                </div>
+
+                                @*<button type="button" id="btnThemAnh" class="btn btn-success mt-2">+ Thêm hình ảnh</button>*@
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.TrangThai, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                <div class="checkbox">
+                                    @Html.EditorFor(model => model.TrangThai)
+                                    @Html.ValidationMessageFor(model => model.TrangThai, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-md-offset-2 col-md-10">
+                                <button type="submit" class="btn btn-primary">Cập nhật</button>
+                                <a href="/admin/tintucs" class="btn btn-danger">Quay lại</a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+<div id="thongBaoSua" class="mt-3"></div>
+@section scripts{
+    <script>
+        $(function () {
+            $("#formSua").submit(function (sua) {
+                sua.preventDefault(); //chặn form gửi truyền thống
+
+                // CKEditor update
+                for (instance in CKEDITOR.instances) {
+                    CKEDITOR.instances[instance].updateElement();
+                }
+                var formData = new FormData(this);
+
+                // Nếu có chọn ảnh mới từ máy
+                if ($("#anhMoi")[0].files.length > 0) {
+                    formData.append("UploadImage", $("#anhMoi")[0].files[0]);
+                }
+
+                // Nếu có chọn ảnh từ CKFinder
+                if ($("#txtImageCK").val() !== "") {
+                    formData.append("Url", $("#txtImageCK").val());
+                }
+                // Kiểm tra độ dài Tóm tắt
+                var tomTat = $("#txtTomTat").val();
+                if (tomTat.length > 1000) {
+                    $("#thongBaoSua").html("<div class='alert alert-danger'>Tóm tắt tin tức không được vượt quá 1000 ký tự!</div>");
+                    return;
+                }
+                $.ajax({
+                    url: '@Url.Action("Edit", "TinTucs")',
+                    type: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function (res) {
+                        if (res.success) {
+                            $("#thongBaoSua").html("<div class = 'alert alert-success'>" + res.message + "</div>");
+
+
+                            // Reset input + CKEditor
+                            $("#formSua .form-control").val('');
+                            if (CKEDITOR.instances['txtTomTat']) {
+                                CKEDITOR.instances['txtTomTat'].setData('');
+                            }
+                            // Reset input + CKEditor
+                            $("#formSua .form-control").val('');
+                            if (CKEDITOR.instances['txtNoiDung']) {
+                                CKEDITOR.instances['txtNoiDung'].setData('');
+                            }
+
+                            //quay lại index sau 1s
+                            setTimeout(function () {
+                                window.location.href = '@Url.Action("Index", "TinTucs")';
+                            }, 1000);
+                        }
+                        else {
+                            $("#thongBaoSua").html("<div class = 'alert alert-danger'>" + res.message + "</div>");
+                        }
+                    },
+                    error: function () {
+                        $("#thongBaoSua").html("<div class = 'alert alert-danger'> Lỗi khi gửi dữ liệu. </div>");
+                    }
+                });
+            });
+            //xóa thông báo khi người dùng gõ lại
+            $("#formSua input, #formSua textarea").on("input", function () {
+                $("#thongBaoSua").empty();
+            });
+
+
+
+            // Khởi tạo CKEditor
+            CKEDITOR.replace('txtNoiDung', {
+                customConfig: '/content/ckeditor/config.js',
+                extraAllowedContent: 'span',
+            });
+            // Khởi tạo CKEditor
+            CKEDITOR.replace('txtTomTat', {
+                customConfig: '/content/ckeditor/config.js',
+                extraAllowedContent: 'span',
+            });
+        });
+
+
+
+        // Xóa ảnh
+        $(document).on("click", ".btnXoaAnh", function () {
+            var id = $(this).data("id");
+            if (confirm("Bạn có chắc chắn muốn xóa ảnh này?")) {
+                $.ajax({
+                    url: '@Url.Action("Delete", "HinhAnhTinTucs")',
+                    type: 'POST',
+                    data: { id: id, __RequestVerificationToken: $("input[name='__RequestVerificationToken']").val() },
+                    success: function () {
+                        $("#img-" + id).remove();
+                    },
+                    error: function () {
+                        alert("Lỗi khi xóa ảnh!");
+                    }
+                });
+            }
+        });
+
+        // Preview file upload
+        $('#anhMoi').on('change', function () {
+            var file = this.files[0];
+            if (file) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#previewImage').attr('src', e.target.result).show();
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // CKFinder chọn ảnh
+        function BrowseServer(field) {
+            var finder = new CKFinder();
+            finder.basePath = '/Content/ckfinder/';
+            finder.selectActionFunction = function (fileUrl) {
+                $('#' + field).val(fileUrl);
+                $('#previewImage').attr('src', fileUrl).show();
+            };
+            finder.popup();
+        }
+
+       
+
+    </script>
+}

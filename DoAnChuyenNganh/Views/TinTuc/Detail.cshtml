@@ -1,0 +1,112 @@
+﻿@model DoAnChuyenNganh.Models.EF.TinTuc
+@{
+    ViewBag.Title = Model.TieuDe;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section class="news-detail" style="margin-top:160px;">
+    <div class="container">
+        <!-- Tiêu đề -->
+        <h2 class="news-title text-center mb-3">@Model.TieuDe</h2>
+
+        <!-- Ngày đăng -->
+        <p class="text-center text-muted mb-4" style="font-size:15px;">
+            Đăng ngày:
+            <span class="fw-semibold text-dark">
+                @(Model.NgayDang.HasValue
+                    ? Model.NgayDang.Value.ToString("dd/MM/yyyy HH:mm")
+                    : "Chưa cập nhật")
+            </span>
+        </p>
+
+        <!-- Ảnh tin tức -->
+        <div class="text-center mb-4">
+            @foreach (var img in Model.HinhAnhTinTucs)
+            {
+                <div class="image-wrapper mb-4">
+                    <img src="@Url.Content(img.Url)"
+                         alt="@Model.TieuDe"
+                         class="img-fluid rounded shadow-sm"
+                         style="max-width:100%; height:auto; border:1px solid #eee; background:#fafafa; padding:5px;">
+                </div>
+            }
+        </div>
+
+        <!-- Nội dung -->
+        <div class="news-content mx-auto" style="max-width:900px; line-height:1.9; text-align:justify;">
+            @Html.Raw(Model.NoiDung)
+        </div>
+
+        <!-- Nút quay lại -->
+        <div class="text-center mt-5">
+            <a href="@Url.Action("Index", "TinTuc")"
+               class="btn btn-outline-danger px-4 py-2 rounded-pill fw-semibold transition-all">
+                ← Quay lại danh sách
+            </a>
+        </div>
+    </div>
+</section>
+
+<style>
+    /* Áp dụng font Times New Roman toàn trang */
+    .news-detail, h2, p, div, a {
+        font-family: "Times New Roman", Times, serif !important;
+    }
+
+    .news-detail {
+        background-color: #fff;
+        min-height: 100vh;
+    }
+
+    /* Tiêu đề in hoa, đậm, nổi bật */
+    .news-title {
+        font-size: 2rem;
+        color: #ff4c4c;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        line-height: 1.4;
+    }
+
+    .news-content {
+        color: #333;
+        font-size: 1.05rem;
+    }
+
+    /* Hiển thị ảnh đầy đủ, không bị crop */
+    .image-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #fdfdfd;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+        .image-wrapper img {
+            max-width: 100%;
+            height: auto;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+
+            .image-wrapper img:hover {
+                transform: scale(1.02);
+            }
+
+    /* Nút quay lại */
+    .btn-outline-danger {
+        border-color: #ff4c4c;
+        color: #ff4c4c;
+    }
+
+        .btn-outline-danger:hover {
+            background-color: #ff4c4c;
+            color: #fff;
+            border-color: #ff4c4c;
+        }
+
+    .transition-all {
+        transition: all 0.3s ease;
+    }
+</style>

@@ -1,0 +1,288 @@
+﻿@using DoAnChuyenNganh.Models.EF
+@model dynamic
+@{
+    ViewBag.Title = "Giỏ hàng";
+    decimal tongTien = 0m;
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger text-center fw-bold">@TempData["Error"]</div>
+}
+
+<link rel="stylesheet" type="text/css" href="~/Content/assets/styles/categories_styles.css" />
+<link rel="stylesheet" type="text/css" href="~/Content/assets/styles/categories_responsive.css" />
+
+<div class="container product_section_container">
+    <div class="row">
+        <div class="col product_section clearfix">
+
+            <!-- Breadcrumbs -->
+            <div class="breadcrumbs d-flex flex-row align-items-center">
+                <ul>
+                    <li><a href="@Url.Action("Index","Home")">Home</a></li>
+                    <li class="active">
+                        <a href="#"><i class="fa fa-angle-right" aria-hidden="true"></i> Giỏ hàng</a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Main content -->
+            <div class="row">
+                <div class="col-12" id="load_data">
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered cart_table">
+                            <thead class="thead-light">
+                                <tr class="text-center">
+                                    <th style="width:40px;">
+                                        <input type="checkbox" id="checkAll" />
+                                    </th>
+                                    <th style="width:60px">#</th>
+                                    <th style="width:120px">Ảnh</th>
+                                    <th>Sản phẩm</th>
+                                    <th style="width:160px">Biến thể</th>
+                                    <th style="width:100px">SL</th>
+                                    <th style="width:140px">Đơn giá</th>
+                                    <th style="width:160px">Thành tiền</th>
+                                    <th style="width:180px">Thao tác</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @if (Model == null)
+                                {
+                                    <tr>
+                                        <td colspan="8" class="text-center py-4">Không có sản phẩm trong giỏ hàng.</td>
+                                    </tr>
+                                }
+                                else if (Model is List<CartItem>)
+                                {
+                                    var cart = Model as List<CartItem>;
+                                    if (!cart.Any())
+                                    {
+                                        <tr>
+                                            <td colspan="8" class="text-center py-4">Không có sản phẩm trong giỏ hàng.</td>
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        var idx = 1;
+                                        foreach (var it in cart)
+                                        {
+                                            var thanhTien = it.SoLuong * it.DonGia; // decimal
+                                            tongTien += thanhTien;
+
+                                            <tr class="text-center" id="row_session_@it.BienTheId">
+                                                <td>
+                                                    <input type="checkbox" class="item-checkbox" value="@it.BienTheId" />
+                                                </td>
+
+                                                <td>@idx</td>
+                                                <td>
+                                                    <img src="@(it.Image ?? "/Content/assets/images/no-image.png")"
+                                                         alt="@it.Name" style="max-width:100px" />
+                                                </td>
+                                                <td class="text-left">@it.Name</td>
+                                                <td>
+                                                    @(string.IsNullOrEmpty(it.Mau) ? "-" : it.Mau)
+                                                    @(string.IsNullOrEmpty(it.Size) ? "" : " / " + it.Size)
+                                                </td>
+                                                <td>
+                                                    <input type="number" min="1" class="form-control text-center qty-input"
+                                                           value="@it.SoLuong" data-variantid="@it.BienTheId" />
+                                                </td>
+                                                <td>@String.Format("{0:N0} ₫", it.DonGia)</td>
+                                                <td>@String.Format("{0:N0} ₫", thanhTien)</td>
+                                                <td>
+                                                    <a href="#" class="btn btn-sm btn-success btnUpdate" data-variantid="@it.BienTheId">Cập nhật</a>
+                                                    <a href="#" class="btn btn-sm btn-danger btnDelete" data-variantid="@it.BienTheId">Xóa</a>
+                                                </td>
+                                            </tr>
+                                            idx++;
+                                        }
+                                    }
+                                }
+                                else if (Model is GioHang)
+                                {
+                                    var gh = Model as GioHang;
+                                    if (gh.GioHangChiTiets == null || !gh.GioHangChiTiets.Any())
+                                    {
+                                        <tr>
+                                            <td colspan="8" class="text-center py-4">Không có sản phẩm trong giỏ hàng.</td>
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        var idx = 1;
+                                        foreach (var ct in gh.GioHangChiTiets)
+                                        {
+                                            // Ảnh: ưu tiên ảnh gắn biến thể, fallback ảnh mặc định SP
+                                            var anh = ct.BienTheSanPham.AnhSanPham_BienThes
+                                                        .Select(x => x.AnhSanPham.Url).FirstOrDefault()
+                                                      ?? ct.BienTheSanPham.SanPham.AnhSanPhams
+                                                        .FirstOrDefault(a => a.MacDinh == true)?.Url;
+
+                                            var mau = ct.BienTheSanPham.GiaTriThuocTinhs
+                                                        .FirstOrDefault(x => x.ThuocTinh.TenThuocTinh == "Màu sắc")?.TenGiaTri;
+                                            var size = ct.BienTheSanPham.GiaTriThuocTinhs
+                                                        .FirstOrDefault(x => x.ThuocTinh.TenThuocTinh == "Size")?.TenGiaTri;
+
+                                            // --- TÍNH GIÁ & CỘNG TỔNG (decimal/decimal?) ---
+                                            decimal donGia = ct.DonGia; // DonGia là decimal (non-null)
+                                            int soLuong = ct.SoLuong;
+                                            decimal thanhTien = ct.ThanhTien ?? (donGia * soLuong);
+                                            tongTien += thanhTien;
+
+                                            <tr class="text-center" id="row_db_@ct.BienTheId">
+                                                <td>
+                                                    <input type="checkbox" class="item-checkbox" value="@ct.BienTheId" />
+                                                </td>
+
+                                                <td>@idx</td>
+                                                <td>
+                                                    <img src="@(anh ?? "/Content/assets/images/no-image.png")"
+                                                         alt="@ct.BienTheSanPham.SanPham.TenSanPham" style="max-width:100px" />
+                                                </td>
+                                                <td class="text-left">
+                                                    <a href="@Url.RouteUrl("DetailSanPham", new { slug = ct.BienTheSanPham.SanPham.Slug, id = ct.BienTheSanPham.SanPhamId })">
+                                                        @ct.BienTheSanPham.SanPham.TenSanPham
+                                                    </a>
+                                                </td>
+                                                <td>
+                                                    @(string.IsNullOrEmpty(mau) ? "-" : mau)
+                                                    @(string.IsNullOrEmpty(size) ? "" : " / " + size)
+                                                </td>
+                                                <td>
+                                                    <input type="number" min="1" class="form-control text-center qty-input"
+                                                           value="@soLuong" data-variantid="@ct.BienTheId" />
+                                                </td>
+                                                <td>@String.Format("{0:N0} ₫", donGia)</td>
+                                                <td>@String.Format("{0:N0} ₫", thanhTien)</td>
+                                                <td>
+                                                    <a href="#" class="btn btn-sm btn-success btnUpdate" data-variantid="@ct.BienTheId">Cập nhật</a>
+                                                    <a href="#" class="btn btn-sm btn-danger btnDelete" data-variantid="@ct.BienTheId">Xóa</a>
+                                                </td>
+                                            </tr>
+                                            idx++;
+                                        }
+                                    }
+                                }
+                            </tbody>
+
+                            @if (tongTien > 0)
+                            {
+                                <tfoot>
+                                    <tr>
+                                        <th colspan="6" class="text-right">Tổng:</th>
+                                        <th class="text-center text-danger">@String.Format("{0:N0} ₫", tongTien)</th>
+                                        <th></th>
+                                    </tr>
+                                </tfoot>
+                            }
+                        </table>
+                    </div>
+
+                    <div class="text-right">
+                        <a href="#" class="btn btn-outline-danger btnDeleteAll">Xóa hết</a>
+                        <a href="@Url.Action("ThanhToan","GioHangs")" class="btn btn-success">Thanh toán</a>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script src="~/Content/assets/js/categories_custom.js"></script>
+    <!-- Giữ nguyên .btnUpdate / .btnDelete / .btnDeleteAll nếu jsShopping đang xử lý -->
+
+
+    <script>
+        $(function () {
+
+            // Tick chọn tất cả
+            $('#checkAll').on('change', function () {
+                $('.item-checkbox').prop('checked', this.checked);
+            });
+
+            // Nếu bỏ chọn 1 item -> bỏ checkAll
+            $(document).on('change', '.item-checkbox', function () {
+                if (!this.checked) $('#checkAll').prop('checked', false);
+                else if ($('.item-checkbox:checked').length === $('.item-checkbox').length)
+                    $('#checkAll').prop('checked', true);
+            });
+
+            // Cập nhật số lượng (giữ nguyên)
+            $('.btnUpdate').on('click', function (e) {
+                e.preventDefault();
+                const id = $(this).data('variantid');
+                const qty = $(`.qty-input[data-variantid='${id}']`).val();
+
+                $.post('/GioHangs/UpdateQuantity', { variantId: id, quantity: qty }, function (res) {
+                    alert(res.message);
+                    if (res.success) location.reload();
+                });
+            });
+
+            // Xóa sản phẩm riêng (giữ nguyên)
+            $('.btnDelete').on('click', function (e) {
+                e.preventDefault();
+                if (!confirm("Bạn có chắc muốn xóa sản phẩm này không?")) return;
+                const id = $(this).data('variantid');
+
+                $.post('/GioHangs/RemoveItem', { variantId: id }, function (res) {
+                    alert(res.message);
+                    if (res.success) location.reload();
+                });
+            });
+
+            // ================================
+            // 🧩 XỬ LÝ CHỌN NHIỀU khi bấm “Xóa hết” hoặc “Thanh toán”
+            // ================================
+
+            // Xóa hết / hoặc các sản phẩm đã tick
+            $('.btnDeleteAll').on('click', function (e) {
+                e.preventDefault();
+                const selected = $('.item-checkbox:checked').map(function () { return $(this).val(); }).get();
+
+                if (selected.length > 0) {
+                    if (!confirm(`Xóa ${selected.length} sản phẩm đã chọn?`)) return;
+
+                    $.ajax({
+                        url: '/GioHangs/RemoveSelected', // gọi action mới
+                        type: 'POST',
+                        traditional: true,
+                        data: { variantIds: selected },
+                        success: function (res) {
+                            alert(res.message);
+                            if (res.success) location.reload();
+                        }
+                    });
+                } else {
+                    if (!confirm("Xóa toàn bộ giỏ hàng?")) return;
+                    $.post('/GioHangs/ClearCart', {}, function (res) {
+                        alert(res.message);
+                        if (res.success) location.reload();
+                    });
+                }
+            });
+
+            // Thanh toán các sản phẩm đã chọn (hoặc toàn bộ)
+            $('.btn-success').on('click', function (e) {
+                const selected = $('.item-checkbox:checked').map(function () { return $(this).val(); }).get();
+
+                if (selected.length > 0) {
+                    e.preventDefault();
+                    // Chuyển hướng sang trang thanh toán kèm ID
+                    const query = '?selected=' + selected.join(',');
+                    window.location.href = '/GioHangs/ThanhToan' + query;
+                }
+            });
+
+        });
+    </script>
+
+
+}

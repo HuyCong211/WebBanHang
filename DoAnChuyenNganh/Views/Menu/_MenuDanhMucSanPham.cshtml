@@ -1,0 +1,26 @@
+﻿@model IEnumerable<DoAnChuyenNganh.Models.EF.DanhMuc>
+
+@if (Model != null && Model.Any())
+{
+
+    <!-- Banner -->
+
+    <div class="banner">
+        <div class="container">
+            <div class="row">
+                @foreach (var item in Model)
+                {
+                    <div class="col-md-4">
+                        <div class="banner_item align-items-center" style="background-image: url('@Url.Content("~/Content/assets/images/" + item.Slug + ".jpg")')">
+                            <div class="banner_category">
+                                <a href="/san-pham/@item.Slug">@item.TenDanhMuc</a>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+
+}    

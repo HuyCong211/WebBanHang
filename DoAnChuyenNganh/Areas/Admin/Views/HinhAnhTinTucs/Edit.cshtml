@@ -1,0 +1,151 @@
+﻿@model DoAnChuyenNganh.Models.EF.HinhAnhTinTuc
+
+@{
+    ViewBag.Title = "Cập nhật";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+
+@section naviheader
+{
+    <!-- Left navbar links -->
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/admin/home" class="nav-link">Trang chủ</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/admin/hinhanhtintucs" class="nav-link">Ảnh tin tức</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="#" class="nav-link">Cập nhật</a>
+        </li>
+    </ul>
+}
+
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Cập nhật ảnh tin tức</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="/admin/hinhanhtintucs/">Ảnh tin tức</a></li>
+                    <li class="breadcrumb-item active">Cập nhật</li>
+                </ol>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<!-- Main content -->
+<section class="content">
+
+    <!-- Default box -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Thông tin cập nhật ảnh tin tức</h3>
+        </div>
+        <div class="card-body">
+            <div class="bs-stepper-content">
+
+                @using (Html.BeginForm("Edit", "HinhAnhTinTucs", FormMethod.Post, new { id = "formSua", enctype = "multipart/form-data" }))
+                {
+                    @Html.AntiForgeryToken()
+
+                    <div class="form-horizontal">
+                        <h4>Hình ảnh tin tức</h4>
+                        <hr />
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                        @Html.HiddenFor(model => model.HinhAnhId)
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.TinTucId, "Mã tin tức", htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.DropDownList("TinTucId", null, htmlAttributes: new { @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.TinTucId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="control-label col-md-2">Hình ảnh</label>
+                            <div class="col-md-10">
+                                <!-- Link hoặc CKFinder -->
+                                <div class="input-group mb-2">
+                                    @Html.TextBoxFor(x => x.Url, new { @id = "txtImage", @class = "form-control", placeholder = "Dán link hoặc chọn ảnh..." })
+                                    <div class="input-group-append">
+                                        <input type="button" class="btn btn-success" value="Chọn ảnh (CKFinder)" onclick="BrowseServer('txtImage');" />
+                                    </div>
+                                </div>
+
+                                <!-- Upload file -->
+                                <div class="input-group mb-2">
+                                    <div class="custom-file">
+                                        <input type="file" name="UploadImage" class="custom-file-input" id="uploadFile" accept="image/*">
+                                        <label class="custom-file-label" for="uploadFile">Chọn ảnh từ máy</label>
+                                    </div>
+                                </div>
+
+                                <!-- Preview ảnh -->
+                                <div class="mt-2">
+                                    <img id="previewImage"
+                                         src="@(string.IsNullOrEmpty(Model?.Url) ? "" : Url.Content(Model.Url))"
+                                         style="max-height:200px; display:@(string.IsNullOrEmpty(Model?.Url) ? "none" : "block"); border:1px solid #ddd; padding:4px;" />
+
+                                </div>
+
+                                @Html.ValidationMessageFor(model => model.Url, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <div class="col-md-offset-2 col-md-10">
+                                <button type="submit" class="btn btn-primary">Lưu</button>
+                                <a href="/admin/hinhanhtintucs" class="btn btn-danger">Quay lại</a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+@section scripts
+{
+
+    <script>
+        // Hiển thị tên file
+        $('#uploadFile').on('change', function () {
+            var fileName = $(this).val().split('\\').pop();
+            $(this).next('.custom-file-label').html(fileName);
+
+            // Preview ảnh ngay
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $('#previewImage').attr('src', e.target.result).show();
+            }
+            reader.readAsDataURL(this.files[0]);
+        });
+
+        // Preview khi chọn ảnh bằng CKFinder
+        function BrowseServer(field) {
+            var finder = new CKFinder();
+            finder.basePath = '/Content/ckfinder/';
+            finder.selectActionFunction = function (fileUrl) {
+                document.getElementById(field).value = fileUrl;
+                $('#previewImage').attr('src', fileUrl).show();
+            };
+            finder.popup();
+        }
+
+    </script>
+
+}

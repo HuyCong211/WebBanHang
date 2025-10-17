@@ -1,0 +1,287 @@
+﻿@model IEnumerable<DoAnChuyenNganh.Models.EF.SanPham>
+@{
+    ViewBag.Title = "Danh sách sản phẩm";
+}
+<link rel="stylesheet" type="text/css" href="~/Content/assets/styles/main_styles.css">
+<link rel="stylesheet" type="text/css" href="~/Content/assets/styles/categories_styles.css">
+<link rel="stylesheet" type="text/css" href="~/Content/assets/styles/categories_responsive.css">
+<div class="container product_section_container">
+    <div class="row">
+        <div class="col product_section clearfix">
+
+            <!-- Breadcrumbs -->
+
+            <div class="breadcrumbs d-flex flex-row align-items-center">
+                <ul>
+                    <li><a href="@Url.Action("Index", "Home")">Home</a></li>
+                    <li class="active"><a href="/"><i class="fa fa-angle-right" aria-hidden="true"></i>@ViewBag.CateName</a></li>
+                </ul>
+            </div>
+
+            <!-- Sidebar -->
+
+            <div class="sidebar">
+                <div class="sidebar_section">
+                    <div class="sidebar_title">
+                        <h5>DANH MỤC SẢN PHẨM</h5>
+                    </div>
+                    @Html.Action("MenuLeft", "Menu", new { slug = ViewBag.Slug, id = ViewBag.DanhMucId })
+                </div>
+
+                <!-- Price Range Filtering -->
+                <div class="sidebar_section">
+                    <div class="sidebar_title">
+                        <h5>Lọc theo giá</h5>
+                    </div>
+                    <p>
+                        <input type="text" id="amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
+                        <input type="hidden" id="FromAmount" />
+                        <input type="hidden" id="ToAmount" />
+                    </p>
+                    <div id="slider-range"></div>
+                    <div class="filter_button"><span>lọc</span></div>
+                </div>
+
+            </div>
+
+            <!-- Main Content -->
+
+            <div class="main_content">
+
+                <!-- Products -->
+
+                <div class="products_iso">
+                    <div class="row">
+                        <div class="col">
+
+                            <!-- Product Sorting -->
+
+                            <div class="product_sorting_container product_sorting_container_top">
+                                <ul class="product_sorting">
+                                    <li>
+                                        <span class="type_sorting_text">Mặc định</span>
+                                        <i class="fa fa-angle-down"></i>
+                                        <ul class="sorting_type">
+                                            <li class="type_sorting_btn" data-isotope-option='{ "sortBy": "original-order" }'><span>Mặc định</span></li>
+                                            <li class="type_sorting_btn" data-isotope-option='{ "sortBy": "price" }'><span>Theo giá</span></li>
+                                            <li class="type_sorting_btn" data-isotope-option='{ "sortBy": "name" }'><span>Theo tên</span></li>
+                                        </ul>
+                                    </li>
+
+
+                                    <!--HIỂN THỊ SỐ SẢN PHẨM TRÊN 1 TRANG-->
+                                    @{
+                                        int currentPageSize = ViewBag.PageSize ?? 6;
+                                    }
+                                    <li>
+                                        <span>Hiển thị</span>
+                                        <span class="num_sorting_text">@currentPageSize</span>
+                                        <i class="fa fa-angle-down"></i>
+                                        <ul class="sorting_num">
+                                            @foreach (var size in new[] { 6, 12, 24 })
+                                            {
+                                                <li class="num_sorting_btn @(currentPageSize == size ? "active" : "")">
+                                                    <span>@size</span>
+                                                </li>
+                                            }
+                                        </ul>
+                                    </li>
+
+                                    @*<li>
+                                            <span>Show</span>
+                                            <span class="num_sorting_text">6</span>
+                                            <i class="fa fa-angle-down"></i>
+                                            <ul class="sorting_num">
+                                                <li class="num_sorting_btn"><span>6</span></li>
+                                                <li class="num_sorting_btn"><span>12</span></li>
+                                                <li class="num_sorting_btn"><span>24</span></li>
+                                            </ul>
+                                        </li>*@
+                                </ul>
+
+                                <!--PHÂN TRANG DETAIL-->
+                                @{
+                                    int currentPage = ViewBag.Page ?? 1;
+                                    int totalPages = ViewBag.TotalPages ?? 1;
+                                    string slug = ViewBag.Slug;
+                                    int? cateid = ViewBag.DanhMucId;
+                                }
+
+                                <div class="pages d-flex flex-row align-items-center">
+                                    <div class="page_current">
+                                        <span>@currentPage</span>
+                                        <ul class="page_selection">
+                                            @for (int i = 1; i <= totalPages; i++)
+                                            {
+                                                <li>
+                                                    <a href="@Url.Action("Index", "Products", new { slug = slug, id = cateid, page = i })">@i</a>
+                                                </li>
+                                            }
+                                        </ul>
+                                    </div>
+                                    <div class="page_total"><span>of</span> @totalPages</div>
+
+                                    @if (currentPage < totalPages)
+                                    {
+                                        <div id="next_page" class="page_next">
+                                            <a href="@Url.Action("Index", "Products", new { slug = slug, id = cateid, page = currentPage + 1 })">
+                                                <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
+                                            </a>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div id="next_page" class="page_next disabled">
+                                            <a href="#"><i class="fa fa-long-arrow-right" aria-hidden="true"></i></a>
+                                        </div>
+                                    }
+                                </div>
+
+
+
+                                @*<div class="pages d-flex flex-row align-items-center">
+                                        <div class="page_current">
+                                            <span>1</span>
+                                            <ul class="page_selection">
+                                                <li><a href="#">1</a></li>
+                                                <li><a href="#">2</a></li>
+                                                <li><a href="#">3</a></li>
+                                            </ul>
+                                        </div>
+                                        <div class="page_total"><span>of</span> 3</div>
+                                        <div id="next_page" class="page_next"><a href="#"><i class="fa fa-long-arrow-right" aria-hidden="true"></i></a></div>
+                                    </div>*@
+
+                            </div>
+
+                            <!-- Product Grid -->
+
+                            <div class="product-grid">
+
+                                <!-- Product 1 -->
+                                @if (Model != null && Model.Any())
+                                {
+                                    foreach (var item in Model)
+                                    {
+                                        var strImage = "";
+                                        var altText = item.TenSanPham; // mặc định alt = tên sản phẩm
+
+                                        // Kiểm tra null cho AnhSanPhams
+                                        var img = item.AnhSanPhams?.FirstOrDefault(x => x.MacDinh == true);
+
+                                        if (img == null)
+                                        {
+                                            img = item.AnhSanPhams?.FirstOrDefault();
+                                        }
+
+                                        if (img != null)
+                                        {
+                                            strImage = img.Url;
+                                            if (!string.IsNullOrEmpty(img.MoTa))
+                                            {
+                                                altText = img.MoTa;
+                                            }
+                                        }
+
+                                        // 🔹 Dùng đúng phần trăm giảm giá đã tính ở Controller
+                                        var discountPercent = item.ViewBag_DiscountPercent > 0
+                                            ? (int)Math.Round(item.ViewBag_DiscountPercent)
+                                            : (int?)null;
+
+
+
+                                        <div class="product-item @(item.DanhMuc?.Slug ?? "") @(item.DanhMuc?.DanhMuc2?.Slug ?? "")">
+                                            <div class="product discount product_filter">
+                                                <div class="product_image">
+                                                    <a href="@Url.RouteUrl("DetailSanPham", new { slug = item.Slug, id = item.SanPhamId })">
+                                                        <img src="@strImage" alt="@altText" />
+                                                    </a>
+
+                                                </div>
+                                                @if (User.Identity.IsAuthenticated)
+                                                {
+                                                    <div class="favorite favorite_left @(item.IsFavorite ? "active" : "")"
+                                                         data-product="@item.SanPhamId"></div>
+                                                }
+
+
+
+                                                @if (discountPercent.HasValue)
+                                                {
+                                                    <div class="product_bubble product_bubble_right product_bubble_red d-flex flex-column align-items-center">
+                                                        <span>-@discountPercent%</span>
+                                                    </div>
+                                                }
+                                                <div class="product_info">
+                                                    <h6 class="product_name">
+                                                        <a href="@Url.RouteUrl("DetailSanPham", new { slug = item.Slug, id = item.SanPhamId })">
+                                                            @item.TenSanPham
+                                                        </a>
+                                                    </h6>
+                                                    <div class="product_price">
+                                                        @String.Format("{0:N0} ₫", item.ViewBag_FinalPrice != 0 ? item.ViewBag_FinalPrice : item.GiaBan)
+                                                        @if (item.ViewBag_DiscountPercent > 0)
+                                                        {
+                                                            <span>@String.Format("{0:N0} ₫", item.GiaGoc ?? item.GiaBan)</span>
+                                                        }
+                                                    </div>
+
+                                                </div>
+                                            </div>
+
+                                            <div class="red_button add_to_cart_button">
+                                                <a href="/Products/Detail/@item.SanPhamId">Add to cart</a>
+                                            </div>
+
+                                        </div>
+                                    }
+                                }
+
+                            </div>
+
+                            <!-- Product Sorting -->
+
+                            <div class="product_sorting_container product_sorting_container_bottom clearfix">
+                                <ul class="product_sorting">
+                                    <li>
+                                        <span>Show:</span>
+                                        <span class="num_sorting_text">@currentPageSize</span>
+                                        <i class="fa fa-angle-down"></i>
+                                        <ul class="sorting_num">
+                                            @foreach (var size in new[] { 6, 12, 24 })
+                                            {
+                                                <li class="num_sorting_btn @(currentPageSize == size ? "active" : "")">
+                                                    <span>@size</span>
+                                                </li>
+                                            }
+                                        </ul>
+                                    </li>
+                                </ul>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script src="~/Content/assets/js/categories_custom.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Khi click chọn số lượng hiển thị (ở bất kỳ khối nào)
+            $('.num_sorting_btn').on('click', function () {
+                var newSize = $(this).find('span').text().trim();
+                var currentUrl = new URL(window.location.href);
+                currentUrl.searchParams.set('pageSize', newSize);
+                currentUrl.searchParams.set('page', 1); // luôn về trang 1 khi đổi số lượng
+                window.location.href = currentUrl.toString();
+            });
+        });
+    </script>
+
+}

@@ -1,0 +1,212 @@
+﻿@model DoAnChuyenNganh.Models.RegisterViewModel
+@{
+    ViewBag.Title = "Đăng ký";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section class="modern-register d-flex align-items-center justify-content-center">
+    <div class="register-box shadow-lg p-4">
+        <h2 class="text-center fw-bold mb-4">Tạo tài khoản mới</h2>
+
+        @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { role = "form" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.ValidationSummary("", new { @class = "text-danger mb-3 text-center" })
+
+            <div class="text-center">
+                <!-- Email -->
+                <div class="mb-3 form-wrapper">
+                    <label class="form-label fw-semibold">Địa chỉ Email</label>
+                    <div class="input-group justify-content-center">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="bi bi-envelope-fill text-muted"></i>
+                        </span>
+                        @Html.TextBoxFor(m => m.Email, new { @class = "form-control border-start-0 text-center", placeholder = "e.g. tenban@email.com" })
+                    </div>
+                    @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger small" })
+                </div>
+
+                <!-- Họ tên -->
+                <div class="mb-3 form-wrapper">
+                    <label class="form-label fw-semibold">Họ và tên</label>
+                    <div class="input-group justify-content-center">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="bi bi-person-fill text-muted"></i>
+                        </span>
+                        @Html.TextBoxFor(m => m.Fullname, new { @class = "form-control border-start-0 text-center", placeholder = "Nhập họ và tên" })
+                    </div>
+                    @Html.ValidationMessageFor(m => m.Fullname, "", new { @class = "text-danger small" })
+                </div>
+
+                <!-- Số điện thoại -->
+                <div class="mb-3 form-wrapper">
+                    <label class="form-label fw-semibold">Số điện thoại</label>
+                    <div class="input-group justify-content-center">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="bi bi-telephone-fill text-muted"></i>
+                        </span>
+                        @Html.TextBoxFor(m => m.Phone, new { @class = "form-control border-start-0 text-center", placeholder = "Nhập số điện thoại" })
+                    </div>
+                    @Html.ValidationMessageFor(m => m.Phone, "", new { @class = "text-danger small" })
+                </div>
+
+                <!-- Mật khẩu -->
+                <div class="mb-3 form-wrapper">
+                    <label class="form-label fw-semibold">Mật khẩu</label>
+                    <div class="input-group justify-content-center">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="bi bi-lock-fill text-muted"></i>
+                        </span>
+                        @Html.PasswordFor(m => m.Password, new { @class = "form-control border-start-0 text-center", placeholder = "Nhập mật khẩu" })
+                    </div>
+                    @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger small" })
+                </div>
+
+                <!-- Xác nhận mật khẩu -->
+                <div class="mb-4 form-wrapper">
+                    <label class="form-label fw-semibold">Xác nhận mật khẩu</label>
+                    <div class="input-group justify-content-center">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="bi bi-shield-lock-fill text-muted"></i>
+                        </span>
+                        @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control border-start-0 text-center", placeholder = "Nhập lại mật khẩu" })
+                    </div>
+                    @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "text-danger small" })
+                </div>
+            </div>
+
+            <!-- Nút đăng ký căn giữa -->
+            <div class="text-center mb-3">
+                <button type="submit" class="btn btn-register fw-bold px-5">Đăng ký</button>
+            </div>
+
+            <!-- Link quay lại đăng nhập -->
+            <div class="text-center small">
+                <span>Bạn đã có tài khoản? </span>
+                <a href="@Url.Action("Login", "Account")" class="text-decoration-none text-danger fw-semibold">Đăng nhập ngay</a>
+            </div>
+        }
+    </div>
+</section>
+
+<style>
+    /* Font riêng cho khung form */
+    .register-box {
+        font-family: "Times New Roman", serif !important;
+    }
+
+    /* Form nền tổng thể */
+    .modern-register {
+        min-height: calc(100vh - 120px); /* Trừ chiều cao header + tạo khoảng thở */
+        background: linear-gradient(135deg, #f9fafb 0%, #fff0f0 100%);
+        position: relative;
+        padding: 140px 0 80px; /* Cách trên 140px, dưới 80px cho đẹp */
+    }
+
+        /* Blob nền */
+        .modern-register::before {
+            content: "";
+            position: absolute;
+            top: 18%;
+            right: 18%;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle at top left, #ff9966, #ff5e62);
+            border-radius: 50%;
+            opacity: 0.8;
+            z-index: 0;
+        }
+
+        .modern-register::after {
+            content: "";
+            position: absolute;
+            bottom: 10%;
+            left: 18%;
+            width: 160px;
+            height: 160px;
+            background: radial-gradient(circle at bottom right, #ff6a88, #ff99ac);
+            border-radius: 50%;
+            opacity: 0.7;
+            z-index: 0;
+        }
+
+    /* Form chính */
+    .register-box {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        max-width: 520px; /* tăng độ rộng */
+        background: rgba(255, 255, 255, 0.94);
+        backdrop-filter: blur(10px);
+        border-radius: 18px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        padding: 50px 60px !important; /* thêm padding ngang cho thoáng */
+    }
+
+    /* Căn giữa input-group */
+    .form-wrapper {
+        max-width: 360px;
+        margin: 0 auto;
+        text-align: left;
+    }
+
+
+    h2 {
+        color: #333;
+        font-size: 1.6rem;
+    }
+
+    /* Căn giữa input-group */
+    .form-wrapper {
+        max-width: 330px;
+        margin: 0 auto;
+        text-align: left;
+    }
+
+    .input-group {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .input-group-text {
+        border-top-left-radius: 6px;
+        border-bottom-left-radius: 6px;
+    }
+
+    .form-control {
+        padding: 12px 14px;
+        font-size: 1rem;
+        border-radius: 0 6px 6px 0;
+    }
+
+        .form-control:focus {
+            border-color: #ff5e62;
+            box-shadow: 0 0 6px rgba(255, 94, 98, 0.3);
+        }
+
+    /* Nút đăng ký */
+    .btn-register {
+        background: linear-gradient(to right, #00b09b, #96c93d);
+        color: #fff;
+        font-size: 1.1rem;
+        padding: 10px 40px;
+        border-radius: 8px;
+        border: none;
+        transition: all 0.3s ease;
+    }
+
+        .btn-register:hover {
+            background: linear-gradient(to right, #00a78b, #8bbf2d);
+            box-shadow: 0 6px 18px rgba(0, 176, 155, 0.3);
+            transform: translateY(-2px);
+        }
+
+    a:hover {
+        color: #00a78b !important;
+    }
+</style>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}

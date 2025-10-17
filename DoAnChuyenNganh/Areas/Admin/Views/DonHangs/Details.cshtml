@@ -1,0 +1,277 @@
+﻿@model DoAnChuyenNganh.Models.EF.DonHang
+
+@{
+    ViewBag.Title = "Chi tiết đơn hàng";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+
+@section naviheader
+{
+    <!-- Left navbar links -->
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/admin/home" class="nav-link">Trang chủ</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/admin/donhangs" class="nav-link">Quản lý đơn hàng</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="#" class="nav-link">Chi tiết đơn hàng</a>
+        </li>
+    </ul>
+}
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary">
+            <i class="fas fa-file-invoice"></i> Chi tiết đơn hàng
+        </h2>
+        <a href="@Url.Action("Index")" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Quay lại danh sách
+        </a>
+    </div>
+
+    <!-- 🔹 Thông tin đơn hàng -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-dark text-white">
+            <strong>Thông tin đơn hàng</strong>
+        </div>
+        <div class="card-body">
+            <p><strong>Mã đơn hàng:</strong> <span class="text-primary">@Model.MaDonHang</span></p>
+            <p><strong>Mã khách hàng:</strong> KH#@Model.KhachHangId</p>
+            <p><strong>Ngày tạo:</strong> @(Model.NgayTao?.ToString("dd/MM/yyyy HH:mm"))</p>
+            <p><strong>Ngày cập nhật:</strong> @(Model.NgayCapNhat?.ToString("dd/MM/yyyy HH:mm"))</p>
+            <p><strong>Tổng tiền:</strong> <span class="text-success">@Model.TongTien.ToString("N0") đ</span></p>
+            <p><strong>Phí vận chuyển:</strong> @(Model.PhiVanChuyen?.ToString("N0")) Miễn phí</p>
+
+            @{
+                string statusText = "";
+                string statusClass = "badge-secondary";
+
+                switch (Model.TrangThai)
+                {
+                    case 0: statusText = "Chờ xử lý"; statusClass = "badge-warning"; break;
+                    case 1: statusText = "Đã xác nhận"; statusClass = "badge-info"; break;
+                    case 2: statusText = "Đang giao"; statusClass = "badge-primary"; break;
+                    case 3: statusText = "Hoàn tất"; statusClass = "badge-success"; break;
+                    case 4: statusText = "Đã hủy"; statusClass = "badge-danger"; break;
+                }
+            }
+
+            <p><strong>Trạng thái:</strong> <span class="badge @statusClass">@statusText</span></p>
+
+            @* 🔸 HIỂN THỊ GHI CHÚ HỦY ĐƠN (NẾU CÓ) *@
+            @if (Model.TrangThai == 4 && !string.IsNullOrEmpty(Model.GhiChu))
+            {
+                <p><strong>Chi tiết hủy:</strong> <span class="text-danger">@Model.GhiChu</span></p>
+            }
+
+            @if (Model.TrangThai != 4)
+            {
+                <div class="mt-3">
+                    <button id="btn-cancel-order" class="btn btn-danger">
+                        <i class="fas fa-times"></i> Hủy đơn hàng
+                    </button>
+                </div>
+            }
+
+            <p>
+                <strong>Phương thức thanh toán:</strong>
+                @(Model.PhuongThucThanhToanId == 1
+                    ? "Thanh toán khi nhận hàng (COD)"
+                    : Model.PhuongThucThanhToanId == 2
+                        ? "Thanh toán qua VNPay"
+                    : Model.PhuongThucThanhToanId == 3
+                        ? "Chuyển khoản qua ngân hàng"
+                        : "Không xác định")
+            </p>
+
+            <p><strong>Ghi chú:</strong> @Model.GhiChu</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- 🔹 Thông tin khách hàng -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <strong>Thông tin khách hàng</strong>
+                </div>
+                <div class="card-body">
+                    @if (Model.KhachHang != null)
+                    {
+                        <p><strong>Mã KH:</strong> KH#@Model.KhachHang.KhachHangId</p>
+                        <p><strong>Giới tính:</strong> @(Model.KhachHang.GioiTinh ?? "Không rõ")</p>
+                    }
+
+                    <!-- 🔸 CHỖ SỬA 1: DÙNG ViewBag.Fullname (chữ thường 'n') -->
+                    @if (ViewBag.Fullname != null)
+                    {
+                        <p><strong>Họ tên:</strong> @ViewBag.Fullname</p>
+                    }
+
+                    <!-- 🔸 CHỖ SỬA 2: UserPhone khớp với ApplicationUser.Phone -->
+                    @if (ViewBag.UserPhone != null)
+                    {
+                        <p><strong>Điện thoại:</strong> @ViewBag.UserPhone</p>
+                    }
+
+                    @if (ViewBag.UserEmail != null)
+                    {
+                        <p><strong>Email:</strong> @ViewBag.UserEmail</p>
+                    }
+
+                    @* Nếu không có thông tin người dùng *@
+                    @if (Model.KhachHang == null && ViewBag.Fullname == null)
+                    {
+                        <p>Khách hàng không xác định (đơn vãng lai).</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- 🔹 Địa chỉ giao hàng -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-secondary text-white">
+                    <strong>Địa chỉ giao hàng</strong>
+                </div>
+                <div class="card-body">
+                    @if (ViewBag.DiaChi != null)
+                    {
+                        <p><strong>Họ tên:</strong> @ViewBag.DiaChi.HoTen</p>
+                        <p><strong>SĐT:</strong> @ViewBag.DiaChi.DienThoai</p>
+                        <p><strong>Địa chỉ:</strong> @ViewBag.DiaChi.DiaChiChiTiet</p>
+                        <p><strong>Khu vực:</strong> @($"{ViewBag.DiaChi.Xa}, {ViewBag.DiaChi.Huyen}, {ViewBag.DiaChi.Tinh}")</p>
+                    }
+                    else
+                    {
+                        <p>Chưa có địa chỉ giao hàng.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🔹 Chi tiết sản phẩm -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-success text-white">
+            <strong>Chi tiết sản phẩm trong đơn</strong>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-bordered table-hover mb-0 text-center align-middle">
+                <thead class="thead-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Biến thể</th>
+                        <th>Số lượng</th>
+                        <th>Đơn giá</th>
+                        <th>Thành tiền</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.DonHangChiTiets != null && Model.DonHangChiTiets.Any())
+                    {
+                        int stt = 1;
+                        foreach (var ct in Model.DonHangChiTiets)
+                        {
+
+                            <tr>
+                                <td>@stt</td>
+                                <td>@(ct.BienTheSanPham?.SanPham?.TenSanPham ?? "Không rõ")</td>
+
+                                <td>
+                                    @{
+                                        // Lấy danh sách thuộc tính biến thể (vd: Màu, Size, ...)
+                                        var thuocTinhs = ct.BienTheSanPham?.GiaTriThuocTinhs?
+                                            .Select(gt => gt.ThuocTinh.TenThuocTinh + ": " + gt.TenGiaTri)
+                                            .ToList();
+                                    }
+                                    @if (thuocTinhs != null && thuocTinhs.Any())
+                                    {
+                                        @(string.Join(", ", thuocTinhs))
+
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">—</span>
+                                    }
+                                </td>
+                                <td>@ct.SoLuong</td>
+                                <td>@ct.DonGia.ToString("N0") đ</td>
+                                <td>@((ct.ThanhTien ?? 0).ToString("N0")) đ</td>
+                            </tr>
+                            stt++;
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="5" class="text-muted">Không có sản phẩm nào trong đơn này.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    h2 i {
+        color: #007bff;
+    }
+
+    .badge {
+        font-size: 0.9rem;
+        padding: 6px 12px;
+        border-radius: 12px;
+    }
+
+    .card {
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .card-header {
+        font-weight: 500;
+    }
+
+    table th, table td {
+        vertical-align: middle !important;
+    }
+</style>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        $('#btn-cancel-order').click(function () {
+            var reason = prompt("Nhập lý do hủy đơn hàng:");
+            if (reason === null) return; // người dùng bấm Cancel
+
+            if (confirm("Xác nhận hủy đơn hàng này?")) {
+                $.ajax({
+                    url: '@Url.Action("UpdateStatus", "DonHangs")',
+                    type: 'POST',
+                    data: {
+                        id: @Model.DonHangId,
+                        trangThai: 4,
+                        lyDo: reason
+                    },
+                    success: function (res) {
+                        if (res.success) {
+                            alert("✅ " + res.message);
+                            location.reload();
+                        } else {
+                            alert("❌ " + res.message);
+                        }
+                    },
+                    error: function () {
+                        alert("⚠️ Có lỗi xảy ra khi hủy đơn hàng.");
+                    }
+                });
+            }
+        });
+    </script>
+}

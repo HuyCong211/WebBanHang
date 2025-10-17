@@ -1,0 +1,69 @@
+﻿@model DoAnChuyenNganh.Areas.Admin.Controllers.RegisterUserViewModel
+@{
+    ViewBag.Title = "Tạo tài khoản mới";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+@section naviheader
+{
+    <!-- Left navbar links -->
+    <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/admin/home" class="nav-link">Trang chủ</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="/admin/Users" class="nav-link">Quản lý tài khoản</a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="#" class="nav-link">Thêm mới</a>
+        </li>
+    </ul>
+}
+<section class="content">
+    <div class="container-fluid">
+        <h2 class="mb-3">Tạo tài khoản mới</h2>
+
+        @using (Html.BeginForm())
+        {
+            @Html.AntiForgeryToken()
+
+            <div class="form-group">
+                <label>Email</label>
+                @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.Email)
+            </div>
+
+            <div class="form-group">
+                <label>Mật khẩu</label>
+                @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.Password)
+            </div>
+
+            <div class="form-group">
+                <label>Họ tên</label>
+                @Html.TextBoxFor(m => m.Fullname, new { @class = "form-control" })
+            </div>
+
+            <div class="form-group">
+                <label>Số điện thoại</label>
+                @Html.TextBoxFor(m => m.Phone, new { @class = "form-control" })
+            </div>
+
+            <div class="form-group">
+                <label>Phân quyền</label><br />
+                @foreach (var role in ViewBag.AllRoles as List<string>)
+                {
+                    <label style="margin-right:10px;">
+                        <input type="checkbox" name="selectedRoles" value="@role" /> @role
+                    </label>
+                }
+            </div>
+
+            <button type="submit" class="btn btn-success">Tạo tài khoản</button>
+            <a href="@Url.Action("Index")" class="btn btn-secondary">Quay lại</a>
+        }
+    </div>
+</section>
